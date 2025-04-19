@@ -24,8 +24,8 @@ class ClassificationsRepositoryImpl
         override fun getClassifications(): Flow<List<Classification>> =
             flow {
                 val cache = local.getClassifications()
-                val result = remote.getClassifications()
 
+                val result = remote.getClassifications()
                 if (cache.first().isEmpty()) {
                     result
                         .onSuccess {

@@ -5,7 +5,6 @@ enum class EventType(
 ) {
     Default("D"),
     Favorite("F"),
-    Suggested("S"),
     ;
 
     companion object {

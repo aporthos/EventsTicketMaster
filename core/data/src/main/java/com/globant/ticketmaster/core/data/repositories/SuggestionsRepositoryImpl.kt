@@ -9,6 +9,7 @@ import com.globant.ticketmaster.core.models.domain.Event
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -29,13 +30,16 @@ class SuggestionsRepositoryImpl
                     localSuggestions.getIdsSuggestionsEvents().flatMapLatest { ids ->
                         localEvents.getSuggestedEvents(ids)
                     }
-                val result = remote.getSuggestionsEvents(countryCode)
-                result
-                    .onSuccess {
-                        localSuggestions.addSuggestionsEvents(it)
-                    }.onFailure {
-                        Timber.e("getSuggestions -> $it")
-                    }
+
+                if (localEvents.first().isEmpty()) {
+                    val result = remote.getSuggestionsEvents(countryCode)
+                    result
+                        .onSuccess {
+                            localSuggestions.addSuggestionsEvents(it)
+                        }.onFailure {
+                            Timber.e("getSuggestions -> $it")
+                        }
+                }
                 emitAll(localEvents)
             }.flowOn(ioDispatcher)
     }

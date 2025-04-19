@@ -1,5 +1,6 @@
 package com.globant.ticketmaster.core.data.datasources
 
+import com.globant.ticketmaster.core.common.EventType
 import com.globant.ticketmaster.core.common.IoDispatcher
 import com.globant.ticketmaster.core.data.mappers.domainToEntities
 import com.globant.ticketmaster.core.data.mappers.entityToDomains
@@ -27,6 +28,12 @@ class EventsLocalDataSourceImpl
                 .map(List<EventsWithVenuesEntity>::entityToDomains)
                 .flowOn(dispatcher)
 
+        override fun getFavoritesEvents(): Flow<List<Event>> =
+            eventsDao
+                .getFavoritesEvents(EventType.Favorite)
+                .map(List<EventsWithVenuesEntity>::entityToDomains)
+                .flowOn(dispatcher)
+
         override fun getSuggestedEvents(ids: List<String>): Flow<List<Event>> =
             eventsDao
                 .getSuggestedEvents(ids)
@@ -41,12 +48,27 @@ class EventsLocalDataSourceImpl
                 }
             }
         }
+
+        override suspend fun setFavoriteEvent(
+            idEvent: String,
+            eventType: EventType,
+        ): Boolean =
+            withContext(dispatcher) {
+                eventsDao.updateFavoriteByIdEvent(idEvent, eventType) > 0
+            }
     }
 
 interface EventsLocalDataSource {
     fun getEvents(): Flow<List<Event>>
 
+    fun getFavoritesEvents(): Flow<List<Event>>
+
     fun getSuggestedEvents(ids: List<String>): Flow<List<Event>>
 
     suspend fun addEvents(events: List<Event>)
+
+    suspend fun setFavoriteEvent(
+        idEvent: String,
+        eventType: EventType,
+    ): Boolean
 }

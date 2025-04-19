@@ -19,7 +19,11 @@ class ClassificationsRemoteDataSourceImpl
             withContext(ioDispatcher) {
                 try {
                     val result = apiServices.getClassifications()
-                    Result.success(result.embedded.classifications.networkToDomains())
+                    val classifications =
+                        result.embedded.classifications
+                            .filter { it.segment != null }
+                            .networkToDomains()
+                    Result.success(classifications)
                 } catch (e: Exception) {
                     Timber.e("getClassifications -> $e")
                     Result.failure(e)

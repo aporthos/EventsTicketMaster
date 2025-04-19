@@ -1,5 +1,6 @@
 package com.globant.ticketmaster.core.data.repositories
 
+import com.globant.ticketmaster.core.common.EventType
 import com.globant.ticketmaster.core.common.IoDispatcher
 import com.globant.ticketmaster.core.data.datasources.EventsLocalDataSource
 import com.globant.ticketmaster.core.data.datasources.EventsRemoteDataSource
@@ -37,4 +38,11 @@ class EventsRepositoryImpl
 //                }
                 emitAll(localEvents)
             }.flowOn(ioDispatcher)
+
+        override fun getFavoritesEvents(): Flow<List<Event>> = local.getFavoritesEvents()
+
+        override suspend fun setFavoriteEvent(
+            idEvent: String,
+            eventType: EventType,
+        ): Boolean = local.setFavoriteEvent(idEvent, eventType)
     }

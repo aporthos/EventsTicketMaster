@@ -42,6 +42,11 @@ android {
     buildFeatures {
         compose = true
     }
+
+    kotlinOptions.freeCompilerArgs +=
+        listOf(
+            "-Xopt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+        )
 }
 
 dependencies {
@@ -68,5 +73,7 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:common"))
     implementation(project(":core:models:domain"))
+    implementation(project(":core:models:ui"))
     implementation(project(":core:designsystem"))
+    implementation(project(":core:ui"))
 }
