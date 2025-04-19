@@ -1,0 +1,14 @@
+package com.globant.ticketmaster.core.common
+
+enum class EventType(
+    val value: String,
+) {
+    Default("D"),
+    Favorite("F"),
+    Suggested("S"),
+    ;
+
+    companion object {
+        fun from(value: String?): EventType = EventType.entries.find { it.value == value } ?: Default
+    }
+}

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    kotlin("kapt")
 }
 
 android {
@@ -41,4 +42,17 @@ android {
 dependencies {
 
     implementation(libs.androidx.core.ktx)
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+
+    implementation(libs.squareup.moshi)
+    implementation(libs.squareup.moshi.kotlin)
+
+    implementation(project(":core:models:entity"))
+    implementation(project(":core:common"))
 }

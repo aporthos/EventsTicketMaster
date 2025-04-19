@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    kotlin("kapt")
 }
 
 android {
@@ -36,9 +37,35 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
+    kotlinOptions.freeCompilerArgs +=
+        listOf(
+            "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+        )
 }
 
 dependencies {
 
     implementation(libs.androidx.core.ktx)
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+    implementation(libs.squareup.retrofit)
+    implementation(libs.squareup.retrofit.moshi)
+    implementation(libs.squareup.okhttp3)
+    implementation(libs.squareup.okhttp3.interceptor)
+    implementation(libs.squareup.moshi)
+    implementation(libs.squareup.moshi.kotlin)
+    kapt(libs.squareup.moshi.codegen)
+
+    implementation(libs.timber)
+
+    implementation(project(":core:domain"))
+    implementation(project(":core:database"))
+    implementation(project(":core:models:domain"))
+    implementation(project(":core:models:entity"))
+    implementation(project(":core:models:network"))
+    implementation(project(":core:network"))
+    implementation(project(":core:common"))
 }
