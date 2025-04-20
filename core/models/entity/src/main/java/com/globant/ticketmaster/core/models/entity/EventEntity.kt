@@ -16,4 +16,6 @@ data class EventEntity(
     val urlImage: String,
     val startDateTime: String,
     val eventType: EventType,
+    val countryCode: String,
+    val idClassification: String,
 )

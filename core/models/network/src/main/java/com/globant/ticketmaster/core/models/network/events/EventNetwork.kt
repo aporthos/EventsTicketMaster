@@ -24,4 +24,6 @@ data class EventNetwork(
     val dates: DatesNetwork?,
     @Json(name = "_embedded")
     val embedded: EmbeddedNetwork<VenuesNetwork>,
+    @Json(name = "classifications")
+    val classifications: List<ClassificationNetwork>?,
 )

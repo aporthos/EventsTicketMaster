@@ -1,5 +1,6 @@
 package com.globant.ticketmaster.feature.events
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,6 +11,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -18,17 +21,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.globant.ticketmaster.core.models.domain.Classification
 import com.globant.ticketmaster.core.models.ui.EventUi
 import com.globant.ticketmaster.core.ui.EventItem
 import com.globant.ticketmaster.core.ui.LoadingScreen
+import com.globant.ticketmaster.core.designsystem.R as DesignSystem
 
 @Composable
 fun EventsRoute(
     onEventClick: (EventUi) -> Unit,
+    onSearchClick: () -> Unit,
+    onClassificationClick: (Classification) -> Unit,
     viewModel: EventsViewModel = hiltViewModel(),
 ) {
     val eventsState by viewModel.suggestionsEventsState.collectAsStateWithLifecycle()
@@ -37,6 +45,8 @@ fun EventsRoute(
         eventsState = eventsState,
         classificationsState = classificationsState,
         onEventClick = onEventClick,
+        onClassificationClick = onClassificationClick,
+        onSearchClick = onSearchClick,
         onFavoriteClick = viewModel::updateFavoriteEvent,
     )
 }
@@ -47,18 +57,30 @@ fun EventsRoute(
     classificationsState: ClassificationsUiState,
     onEventClick: (EventUi) -> Unit,
     onFavoriteClick: (EventUi) -> Unit,
+    onSearchClick: () -> Unit,
+    onClassificationClick: (Classification) -> Unit,
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(R.string.title_events)) },
+                actions = {
+                    IconButton(onClick = {
+                        onSearchClick()
+                    }) {
+                        Icon(
+                            painter = painterResource(id = DesignSystem.drawable.search),
+                            contentDescription = null,
+                        )
+                    }
+                },
             )
         },
         content = { paddingValues ->
             Column(
                 modifier = Modifier.padding(paddingValues),
             ) {
-                SectionClassifications(classificationsState)
+                SectionClassifications(classificationsState, onClassificationClick)
                 SectionEvents(eventsState, onEventClick, onFavoriteClick)
             }
         },
@@ -93,7 +115,10 @@ fun SectionEvents(
 }
 
 @Composable
-fun SectionClassifications(classificationsState: ClassificationsUiState) {
+fun SectionClassifications(
+    classificationsState: ClassificationsUiState,
+    onClassificationClick: (Classification) -> Unit,
+) {
     when (classificationsState) {
         ClassificationsUiState.Error -> {
         }
@@ -116,7 +141,10 @@ fun SectionClassifications(classificationsState: ClassificationsUiState) {
                     key = { it.idClassification },
                 ) { item ->
                     Card(
-                        modifier = Modifier.padding(horizontal = 2.dp),
+                        modifier =
+                            Modifier
+                                .padding(horizontal = 2.dp)
+                                .clickable { onClassificationClick(item) },
                     ) {
                         Text(
                             style = MaterialTheme.typography.titleLarge,

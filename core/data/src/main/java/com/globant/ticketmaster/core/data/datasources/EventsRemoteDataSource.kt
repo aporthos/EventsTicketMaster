@@ -15,11 +15,23 @@ class EventsRemoteDataSourceImpl
         private val apiServices: ApiServices,
         @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     ) : EventsRemoteDataSource {
-        override suspend fun getEvents(countryCode: String): Result<List<Event>> =
+        override suspend fun getEvents(
+            countryCode: String,
+            keyword: String,
+            idClassification: String,
+        ): Result<List<Event>> =
             withContext(ioDispatcher) {
                 try {
-                    val result = apiServices.getEvents(countryCode)
-                    Result.success(result.embedded.events.networkToDomains())
+                    val result =
+                        apiServices.getEvents(
+                            countryCode = countryCode,
+                            keyword = keyword,
+                            idClassification = idClassification,
+                        )
+                    Result.success(
+                        result.embedded?.events?.networkToDomains(countryCode = countryCode)
+                            ?: emptyList(),
+                    )
                 } catch (e: Exception) {
                     Timber.e("getEvents -> $e")
                     Result.failure(e)
@@ -28,5 +40,9 @@ class EventsRemoteDataSourceImpl
     }
 
 interface EventsRemoteDataSource {
-    suspend fun getEvents(countryCode: String): Result<List<Event>>
+    suspend fun getEvents(
+        countryCode: String,
+        keyword: String,
+        idClassification: String,
+    ): Result<List<Event>>
 }

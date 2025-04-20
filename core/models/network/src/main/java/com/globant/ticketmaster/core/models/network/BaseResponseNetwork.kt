@@ -6,7 +6,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class BaseResponseNetwork<T>(
     @Json(name = "_embedded")
-    val embedded: EmbeddedNetwork<T>,
+    val embedded: EmbeddedNetwork<T>?,
     @Json(name = "_links")
     val links: LinksNetwork?,
     @Json(name = "page")

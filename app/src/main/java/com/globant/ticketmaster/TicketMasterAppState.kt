@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.rememberNavController
 import com.globant.ticketmaster.feature.detailevent.DetailEvent
+import com.globant.ticketmaster.feature.searchevent.SearchEvents
 
 @Composable
 fun rememberTicketMasterAppState(navController: NavHostController = rememberNavController()) =
@@ -38,7 +39,14 @@ class TicketMasterAppState(
         }
     }
 
-    fun navigateToEventDetail(route: DetailEvent) {
+    fun navigateToDetailEvent(route: DetailEvent) {
+        navController.navigate(route) {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
+    fun navigateToSearchEvents(route: SearchEvents) {
         navController.navigate(route) {
             navigate()
         }

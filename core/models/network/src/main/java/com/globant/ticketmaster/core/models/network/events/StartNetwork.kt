@@ -6,17 +6,17 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class StartNetwork(
     @Json(name = "dateTBA")
-    val dateTba: Boolean,
+    val dateTba: Boolean?,
     @Json(name = "dateTBD")
-    val dateTbd: Boolean,
+    val dateTbd: Boolean?,
     @Json(name = "dateTime")
-    val dateTime: String,
+    val dateTime: String?,
     @Json(name = "localDate")
-    val localDate: String,
+    val localDate: String?,
     @Json(name = "localTime")
-    val localTime: String,
+    val localTime: String?,
     @Json(name = "noSpecificTime")
-    val noSpecificTime: Boolean,
+    val noSpecificTime: Boolean?,
     @Json(name = "timeTBA")
-    val timeTba: Boolean,
+    val timeTba: Boolean?,
 )

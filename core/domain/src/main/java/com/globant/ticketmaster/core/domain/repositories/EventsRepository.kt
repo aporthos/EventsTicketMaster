@@ -5,7 +5,11 @@ import com.globant.ticketmaster.core.models.domain.Event
 import kotlinx.coroutines.flow.Flow
 
 interface EventsRepository {
-    fun getEvents(countryCode: String): Flow<List<Event>>
+    fun getEvents(
+        countryCode: String,
+        keyword: String,
+        idClassification: String,
+    ): Flow<List<Event>>
 
     fun getDetailEvent(idEvent: String): Flow<Event>
 

@@ -16,7 +16,14 @@ class GetEventsUseCase
     ) : FlowSingleUseCase<GetEventsUseCase.Params, List<Event>>(dispatcher) {
         data class Params(
             val countryCode: String,
+            val keyword: String,
+            val idClassification: String,
         )
 
-        override fun execute(params: Params): Flow<List<Event>> = repository.getEvents(params.countryCode)
+        override fun execute(params: Params): Flow<List<Event>> =
+            repository.getEvents(
+                countryCode = params.countryCode,
+                keyword = params.keyword,
+                idClassification = params.idClassification,
+            )
     }

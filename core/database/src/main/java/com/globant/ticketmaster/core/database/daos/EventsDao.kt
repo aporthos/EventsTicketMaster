@@ -19,9 +19,18 @@ interface EventsDao {
     @Query(
         value = """
             SELECT * FROM events
+            WHERE 
+            countryCode = :countryCode 
+            AND idClassification LIKE :idClassification
+            AND name LIKE :keyword
+            LIMIT 20
     """,
     )
-    fun getAllEvents(): Flow<List<EventsWithVenuesEntity>>
+    fun getAllEvents(
+        countryCode: String,
+        keyword: String,
+        idClassification: String,
+    ): Flow<List<EventsWithVenuesEntity>>
 
     @Transaction
     @Query(

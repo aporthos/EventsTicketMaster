@@ -15,11 +15,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
 import com.globant.ticketmaster.core.designsystem.theme.ChallengeTicketmasterTheme
+import com.globant.ticketmaster.core.models.domain.Classification
 import com.globant.ticketmaster.core.models.ui.EventUi
 import com.globant.ticketmaster.feature.detailevent.DetailEvent
 import com.globant.ticketmaster.feature.detailevent.DetailEventRoute
 import com.globant.ticketmaster.feature.events.EventsRoute
 import com.globant.ticketmaster.feature.favorites.FavoritesRoute
+import com.globant.ticketmaster.feature.searchevent.SearchEvents
+import com.globant.ticketmaster.feature.searchevent.SearchEventsRoute
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -45,14 +48,32 @@ fun TicketMasterAppNavHost(appState: TicketMasterAppState) {
         composable<AppSections.Onboarding> {
         }
         composable<AppSections.Home> {
-            HomeMainContainer(items = appState.bottomBarRoutes, onEventClick = {
-                appState.navigateToEventDetail(DetailEvent(it.idEvent, it.name))
-            })
+            HomeMainContainer(
+                items = appState.bottomBarRoutes,
+                onEventClick = {
+                    appState.navigateToDetailEvent(DetailEvent(it.idEvent, it.name))
+                },
+                onClassificationClick = {
+                    appState.navigateToSearchEvents(SearchEvents(it.idClassification))
+                },
+                onSearchClick = {
+                    appState.navigateToSearchEvents(SearchEvents(""))
+                },
+            )
         }
 
         composable<DetailEvent> { backStackEntry ->
             val name = backStackEntry.toRoute<DetailEvent>().name
             DetailEventRoute(name = name, onBackClick = appState::upPress)
+        }
+
+        composable<SearchEvents> {
+            SearchEventsRoute(
+                onEventClick = {
+                    appState.navigateToDetailEvent(DetailEvent(it.idEvent, it.name))
+                },
+                onBackClick = appState::upPress,
+            )
         }
     }
 }
@@ -61,6 +82,8 @@ fun TicketMasterAppNavHost(appState: TicketMasterAppState) {
 fun HomeMainContainer(
     items: List<HomeSections>,
     onEventClick: (EventUi) -> Unit,
+    onSearchClick: () -> Unit,
+    onClassificationClick: (Classification) -> Unit,
 ) {
     val appState = rememberTicketMasterAppState()
     val backStackEntry by appState.navController.currentBackStackEntryAsState()
@@ -80,7 +103,11 @@ fun HomeMainContainer(
             startDestination = HomeSections.Events.route,
         ) {
             composable(HomeSections.Events.route) {
-                EventsRoute(onEventClick)
+                EventsRoute(
+                    onEventClick = onEventClick,
+                    onSearchClick = onSearchClick,
+                    onClassificationClick = onClassificationClick,
+                )
             }
             composable(HomeSections.Favorites.route) {
                 FavoritesRoute(onEventClick)

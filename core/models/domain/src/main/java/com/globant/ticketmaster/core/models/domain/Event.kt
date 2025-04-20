@@ -12,4 +12,6 @@ data class Event(
     val startDateTime: String,
     val venues: List<Venues>,
     val eventType: EventType,
+    val countryCode: String,
+    val idClassification: String,
 )

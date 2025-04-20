@@ -24,10 +24,17 @@ class EventsLocalDataSourceImpl
         private val venuesDao: VenuesDao,
         @IoDispatcher private val dispatcher: CoroutineDispatcher,
     ) : EventsLocalDataSource {
-        override fun getEvents(): Flow<List<Event>> =
+        override fun getEvents(
+            countryCode: String,
+            keyword: String,
+            idClassification: String,
+        ): Flow<List<Event>> =
             eventsDao
-                .getAllEvents()
-                .map(List<EventsWithVenuesEntity>::entityToDomains)
+                .getAllEvents(
+                    countryCode = countryCode,
+                    keyword = search(keyword),
+                    idClassification = search(idClassification),
+                ).map(List<EventsWithVenuesEntity>::entityToDomains)
                 .flowOn(dispatcher)
 
         override fun getDetailEvent(idEvent: String): Flow<Event> =
@@ -66,10 +73,21 @@ class EventsLocalDataSourceImpl
             withContext(dispatcher) {
                 eventsDao.updateFavoriteByIdEvent(idEvent, eventType) > 0
             }
+
+        private fun search(keyword: String): String =
+            if (keyword.isEmpty()) {
+                "%%"
+            } else {
+                "%$keyword%"
+            }
     }
 
 interface EventsLocalDataSource {
-    fun getEvents(): Flow<List<Event>>
+    fun getEvents(
+        countryCode: String,
+        keyword: String,
+        idClassification: String,
+    ): Flow<List<Event>>
 
     fun getDetailEvent(idEvent: String): Flow<Event>
 

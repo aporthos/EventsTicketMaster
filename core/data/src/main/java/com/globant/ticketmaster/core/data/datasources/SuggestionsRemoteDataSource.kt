@@ -19,7 +19,10 @@ class SuggestionsRemoteDataSourceImpl
             withContext(ioDispatcher) {
                 try {
                     val result = apiServices.getSuggestions(countryCode)
-                    Result.success(result.embedded.events.networkToDomains())
+                    Result.success(
+                        result.embedded?.events?.networkToDomains(countryCode = countryCode)
+                            ?: emptyList(),
+                    )
                 } catch (e: Exception) {
                     Timber.e("getSuggestions -> $e")
                     Result.failure(e)

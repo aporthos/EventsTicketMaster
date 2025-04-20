@@ -9,7 +9,6 @@ import com.globant.ticketmaster.core.models.domain.Event
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import timber.log.Timber
@@ -22,21 +21,35 @@ class EventsRepositoryImpl
         private val remote: EventsRemoteDataSource,
         @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     ) : EventsRepository {
-        override fun getEvents(countryCode: String): Flow<List<Event>> =
+        override fun getEvents(
+            countryCode: String,
+            keyword: String,
+            idClassification: String,
+        ): Flow<List<Event>> =
             flow {
-                val localEvents = local.getEvents()
+                val localEvents =
+                    local.getEvents(
+                        countryCode = countryCode,
+                        keyword = keyword,
+                        idClassification = idClassification,
+                    )
 
                 // TODO: Fix sync remote/local
-                if (localEvents.first().isEmpty()) {
-                    val result = remote.getEvents(countryCode)
-                    result
-                        .onSuccess {
-                            Timber.i("getEvents ${it.size}")
-                            local.addEvents(it)
-                        }.onFailure {
-                            Timber.e("getEvents -> $it")
-                        }
-                }
+//                if (localEvents.first().isEmpty()) {
+                val result =
+                    remote.getEvents(
+                        countryCode = countryCode,
+                        keyword = keyword,
+                        idClassification = idClassification,
+                    )
+                result
+                    .onSuccess {
+                        Timber.i("getEvents ${it.size}")
+                        local.addEvents(it)
+                    }.onFailure {
+                        Timber.e("getEvents -> $it")
+                    }
+//                }
                 emitAll(localEvents)
             }.flowOn(ioDispatcher)
 

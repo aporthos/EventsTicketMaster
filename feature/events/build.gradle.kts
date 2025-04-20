@@ -65,9 +65,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
 
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network)
-
     debugImplementation(libs.androidx.ui.tooling)
 
     implementation(project(":core:domain"))

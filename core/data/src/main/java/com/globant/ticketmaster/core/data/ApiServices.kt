@@ -10,6 +10,8 @@ interface ApiServices {
     @GET("discovery/v2/events")
     suspend fun getEvents(
         @Query("countryCode") countryCode: String,
+        @Query("keyword") keyword: String,
+        @Query("classificationId") idClassification: String,
     ): BaseResponseNetwork<EventNetwork>
 
     @GET("discovery/v2/classifications")

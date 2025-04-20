@@ -1,5 +1,6 @@
 package com.globant.ticketmaster.core.models.network.events
 
-data class Status(
-    val code: String?,
+data class Genre(
+    val id: String,
+    val name: String,
 )
