@@ -1,33 +1,26 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.hilt)
-    kotlin("kapt")
     alias(libs.plugins.kotlin.serialization)
+    kotlin("kapt")
 }
 
 android {
-    namespace = "com.globant.ticketmaster"
+    namespace = "com.globant.ticketmaster.feature.detailevent"
     compileSdk =
         libs.versions.compileSdk
             .get()
             .toInt()
 
     defaultConfig {
-        applicationId = "com.globant.ticketmaster"
         minSdk =
             libs.versions.minSdk
                 .get()
                 .toInt()
-        targetSdk =
-            libs.versions.targetSdk
-                .get()
-                .toInt()
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -46,36 +39,43 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
     buildFeatures {
-        buildConfig = true
         compose = true
     }
+
+    kotlinOptions.freeCompilerArgs +=
+        listOf(
+            "-Xopt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+        )
 }
 
 dependencies {
+
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.material3)
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
 
     implementation(libs.timber)
     implementation(libs.kotlinx.serialization.json)
 
-    implementation(project(":core:common"))
-    implementation(project(":core:data"))
-    implementation(project(":core:database"))
-    implementation(project(":core:designsystem"))
-    implementation(project(":core:designsystem"))
-    implementation(project(":core:domain"))
-    implementation(project(":core:network"))
-    implementation(project(":core:models:ui"))
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network)
 
-    implementation(project(":feature:events"))
-    implementation(project(":feature:favorites"))
-    implementation(project(":feature:detailevent"))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    debugImplementation(libs.androidx.ui.tooling)
+
+    implementation(project(":core:domain"))
+    implementation(project(":core:common"))
+    implementation(project(":core:models:domain"))
+    implementation(project(":core:models:ui"))
+    implementation(project(":core:ui"))
+    implementation(project(":core:designsystem"))
 }

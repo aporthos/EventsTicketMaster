@@ -9,6 +9,7 @@ import com.globant.ticketmaster.core.models.domain.Event
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import timber.log.Timber
@@ -26,18 +27,20 @@ class EventsRepositoryImpl
                 val localEvents = local.getEvents()
 
                 // TODO: Fix sync remote/local
-//                if (localEvents.first().isEmpty()) {
-                val result = remote.getEvents(countryCode)
-                result
-                    .onSuccess {
-                        Timber.i("getEvents ${it.size}")
-                        local.addEvents(it)
-                    }.onFailure {
-                        Timber.e("getEvents -> $it")
-                    }
-//                }
+                if (localEvents.first().isEmpty()) {
+                    val result = remote.getEvents(countryCode)
+                    result
+                        .onSuccess {
+                            Timber.i("getEvents ${it.size}")
+                            local.addEvents(it)
+                        }.onFailure {
+                            Timber.e("getEvents -> $it")
+                        }
+                }
                 emitAll(localEvents)
             }.flowOn(ioDispatcher)
+
+        override fun getDetailEvent(idEvent: String): Flow<Event> = local.getDetailEvent(idEvent)
 
         override fun getFavoritesEvents(): Flow<List<Event>> = local.getFavoritesEvents()
 

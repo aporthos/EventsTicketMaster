@@ -13,7 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.toRoute
 import com.globant.ticketmaster.core.designsystem.theme.ChallengeTicketmasterTheme
+import com.globant.ticketmaster.core.models.ui.EventUi
+import com.globant.ticketmaster.feature.detailevent.DetailEvent
+import com.globant.ticketmaster.feature.detailevent.DetailEventRoute
 import com.globant.ticketmaster.feature.events.EventsRoute
 import com.globant.ticketmaster.feature.favorites.FavoritesRoute
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,13 +45,23 @@ fun TicketMasterAppNavHost(appState: TicketMasterAppState) {
         composable<AppSections.Onboarding> {
         }
         composable<AppSections.Home> {
-            HomeMainContainer(appState.bottomBarRoutes)
+            HomeMainContainer(items = appState.bottomBarRoutes, onEventClick = {
+                appState.navigateToEventDetail(DetailEvent(it.idEvent, it.name))
+            })
+        }
+
+        composable<DetailEvent> { backStackEntry ->
+            val name = backStackEntry.toRoute<DetailEvent>().name
+            DetailEventRoute(name = name, onBackClick = appState::upPress)
         }
     }
 }
 
 @Composable
-fun HomeMainContainer(items: List<HomeSections>) {
+fun HomeMainContainer(
+    items: List<HomeSections>,
+    onEventClick: (EventUi) -> Unit,
+) {
     val appState = rememberTicketMasterAppState()
     val backStackEntry by appState.navController.currentBackStackEntryAsState()
     Scaffold(bottomBar = {
@@ -66,10 +80,10 @@ fun HomeMainContainer(items: List<HomeSections>) {
             startDestination = HomeSections.Events.route,
         ) {
             composable(HomeSections.Events.route) {
-                EventsRoute()
+                EventsRoute(onEventClick)
             }
             composable(HomeSections.Favorites.route) {
-                FavoritesRoute()
+                FavoritesRoute(onEventClick)
             }
         }
     })

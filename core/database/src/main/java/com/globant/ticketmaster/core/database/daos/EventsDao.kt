@@ -27,6 +27,15 @@ interface EventsDao {
     @Query(
         value = """
             SELECT * FROM events
+            WHERE idEvent = :idEvent
+    """,
+    )
+    fun getEventById(idEvent: String): Flow<EventsWithVenuesEntity>
+
+    @Transaction
+    @Query(
+        value = """
+            SELECT * FROM events
             WHERE eventType = :eventType
     """,
     )

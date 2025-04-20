@@ -5,7 +5,9 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.rememberNavController
+import com.globant.ticketmaster.feature.detailevent.DetailEvent
 
 @Composable
 fun rememberTicketMasterAppState(navController: NavHostController = rememberNavController()) =
@@ -33,6 +35,20 @@ class TicketMasterAppState(
                     saveState = true
                 }
             }
+        }
+    }
+
+    fun navigateToEventDetail(route: DetailEvent) {
+        navController.navigate(route) {
+            navigate()
+        }
+    }
+
+    private fun NavOptionsBuilder.navigate() {
+        launchSingleTop = true
+        restoreState = true
+        popUpTo(navController.graph.findStartDestination().id) {
+            saveState = true
         }
     }
 

@@ -18,14 +18,22 @@ import com.globant.ticketmaster.core.ui.EventItem
 import com.globant.ticketmaster.core.ui.LoadingScreen
 
 @Composable
-fun FavoritesRoute(viewModel: FavoritesViewModel = hiltViewModel()) {
+fun FavoritesRoute(
+    onEventClick: (EventUi) -> Unit,
+    viewModel: FavoritesViewModel = hiltViewModel(),
+) {
     val eventsState by viewModel.uiState.collectAsStateWithLifecycle()
-    FavoritesRoute(eventsState = eventsState, onFavoriteClick = viewModel::updateFavoriteEvent)
+    FavoritesRoute(
+        eventsState = eventsState,
+        onEventClick = onEventClick,
+        onFavoriteClick = viewModel::updateFavoriteEvent,
+    )
 }
 
 @Composable
 fun FavoritesRoute(
     eventsState: EventsUiState,
+    onEventClick: (EventUi) -> Unit,
     onFavoriteClick: (EventUi) -> Unit,
 ) {
     Scaffold(
@@ -45,7 +53,7 @@ fun FavoritesRoute(
                         modifier = Modifier.padding(paddingValues),
                     ) {
                         items(eventsState.events, key = { it.idEvent }) { item ->
-                            EventItem(item, onFavoriteClick)
+                            EventItem(item, onEventClick, onFavoriteClick)
                         }
                     }
                 }

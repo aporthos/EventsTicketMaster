@@ -3,6 +3,7 @@ package com.globant.ticketmaster.core.data.datasources
 import com.globant.ticketmaster.core.common.EventType
 import com.globant.ticketmaster.core.common.IoDispatcher
 import com.globant.ticketmaster.core.data.mappers.domainToEntities
+import com.globant.ticketmaster.core.data.mappers.entityToDomain
 import com.globant.ticketmaster.core.data.mappers.entityToDomains
 import com.globant.ticketmaster.core.database.daos.EventsDao
 import com.globant.ticketmaster.core.database.daos.VenuesDao
@@ -10,6 +11,7 @@ import com.globant.ticketmaster.core.models.domain.Event
 import com.globant.ticketmaster.core.models.entity.EventsWithVenuesEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -27,6 +29,14 @@ class EventsLocalDataSourceImpl
                 .getAllEvents()
                 .map(List<EventsWithVenuesEntity>::entityToDomains)
                 .flowOn(dispatcher)
+
+        override fun getDetailEvent(idEvent: String): Flow<Event> =
+            eventsDao
+                .getEventById(idEvent)
+                .map(EventsWithVenuesEntity::entityToDomain)
+                .catch {
+                    throw it
+                }.flowOn(dispatcher)
 
         override fun getFavoritesEvents(): Flow<List<Event>> =
             eventsDao
@@ -60,6 +70,8 @@ class EventsLocalDataSourceImpl
 
 interface EventsLocalDataSource {
     fun getEvents(): Flow<List<Event>>
+
+    fun getDetailEvent(idEvent: String): Flow<Event>
 
     fun getFavoritesEvents(): Flow<List<Event>>
 

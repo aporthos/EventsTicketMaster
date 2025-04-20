@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
 interface EventsRepository {
     fun getEvents(countryCode: String): Flow<List<Event>>
 
+    fun getDetailEvent(idEvent: String): Flow<Event>
+
     fun getFavoritesEvents(): Flow<List<Event>>
 
     suspend fun setFavoriteEvent(

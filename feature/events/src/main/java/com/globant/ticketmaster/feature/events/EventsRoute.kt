@@ -27,12 +27,16 @@ import com.globant.ticketmaster.core.ui.EventItem
 import com.globant.ticketmaster.core.ui.LoadingScreen
 
 @Composable
-fun EventsRoute(viewModel: EventsViewModel = hiltViewModel()) {
+fun EventsRoute(
+    onEventClick: (EventUi) -> Unit,
+    viewModel: EventsViewModel = hiltViewModel(),
+) {
     val eventsState by viewModel.suggestionsEventsState.collectAsStateWithLifecycle()
     val classificationsState by viewModel.classificationsState.collectAsStateWithLifecycle()
     EventsRoute(
         eventsState = eventsState,
         classificationsState = classificationsState,
+        onEventClick = onEventClick,
         onFavoriteClick = viewModel::updateFavoriteEvent,
     )
 }
@@ -41,6 +45,7 @@ fun EventsRoute(viewModel: EventsViewModel = hiltViewModel()) {
 fun EventsRoute(
     eventsState: EventsUiState,
     classificationsState: ClassificationsUiState,
+    onEventClick: (EventUi) -> Unit,
     onFavoriteClick: (EventUi) -> Unit,
 ) {
     Scaffold(
@@ -54,7 +59,7 @@ fun EventsRoute(
                 modifier = Modifier.padding(paddingValues),
             ) {
                 SectionClassifications(classificationsState)
-                SectionEvents(eventsState, onFavoriteClick)
+                SectionEvents(eventsState, onEventClick, onFavoriteClick)
             }
         },
     )
@@ -63,6 +68,7 @@ fun EventsRoute(
 @Composable
 fun SectionEvents(
     eventsState: EventsUiState,
+    onEventClick: (EventUi) -> Unit,
     onFavoriteClick: (EventUi) -> Unit,
 ) {
     when (eventsState) {
@@ -79,7 +85,7 @@ fun SectionEvents(
             )
             LazyColumn {
                 items(eventsState.suggestionsEvents, key = { it.idEvent }) { item ->
-                    EventItem(item, onFavoriteClick)
+                    EventItem(item, onEventClick, onFavoriteClick)
                 }
             }
         }

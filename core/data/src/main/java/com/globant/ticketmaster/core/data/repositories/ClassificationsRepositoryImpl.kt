@@ -25,8 +25,8 @@ class ClassificationsRepositoryImpl
             flow {
                 val cache = local.getClassifications()
 
-                val result = remote.getClassifications()
                 if (cache.first().isEmpty()) {
+                    val result = remote.getClassifications()
                     result
                         .onSuccess {
                             local.addClassifications(it)

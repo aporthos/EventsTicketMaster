@@ -1,5 +1,6 @@
 package com.globant.ticketmaster.core.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,9 +32,13 @@ import com.globant.ticketmaster.core.designsystem.R as Designsystem
 @Composable
 fun EventItem(
     event: EventUi,
+    onEventClick: (EventUi) -> Unit,
     onFavoriteClick: (EventUi) -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(0.dp)) {
+    Card(
+        modifier = Modifier.fillMaxWidth().clickable { onEventClick(event) },
+        shape = RoundedCornerShape(0.dp),
+    ) {
         Row(modifier = Modifier.padding(8.dp)) {
             Column {
                 AsyncImage(
@@ -124,5 +129,5 @@ fun EventItemPreview() {
                     ),
                 ),
         )
-    EventItem(event, {})
+    EventItem(event, {}, {})
 }
