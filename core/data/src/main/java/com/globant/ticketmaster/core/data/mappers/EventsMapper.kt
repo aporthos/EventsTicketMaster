@@ -4,6 +4,7 @@ import com.globant.ticketmaster.core.common.EventType
 import com.globant.ticketmaster.core.models.domain.Event
 import com.globant.ticketmaster.core.models.entity.EventEntity
 import com.globant.ticketmaster.core.models.entity.EventsWithVenuesEntity
+import com.globant.ticketmaster.core.models.entity.FavoritesWithEventsEntity
 import com.globant.ticketmaster.core.models.entity.LastVisitedWithEventsEntity
 import com.globant.ticketmaster.core.models.network.events.EventNetwork
 
@@ -17,7 +18,7 @@ fun EventsWithVenuesEntity.entityToDomain(): Event =
         urlImage = event.urlImage,
         startDateTime = event.startDateTime,
         venues = venues.entityToDomains(),
-        eventType = event.eventType,
+        eventType = favorite?.eventType ?: EventType.Default,
         countryCode = event.countryCode,
         idClassification = event.idClassification,
         page = event.page,
@@ -32,27 +33,27 @@ fun LastVisitedWithEventsEntity.entityToDomain(): Event =
         locale = event.locale,
         urlImage = event.urlImage,
         startDateTime = event.startDateTime,
-        venues = emptyList(),
-        eventType = event.eventType,
+        venues = venues.entityToDomains(),
+        eventType = favorite?.eventType ?: EventType.Default,
         countryCode = event.countryCode,
         idClassification = event.idClassification,
         page = event.page,
     )
 
-fun EventEntity.entityToDomain(): Event =
+fun FavoritesWithEventsEntity.entityToDomain(): Event =
     Event(
-        idEvent = idEvent,
-        name = name,
-        type = type,
-        urlEvent = urlEvent,
-        locale = locale,
-        urlImage = urlImage,
-        startDateTime = startDateTime,
-        venues = listOf(),
-        eventType = eventType,
-        countryCode = countryCode,
-        idClassification = idClassification,
-        page = page,
+        idEvent = event.idEvent,
+        name = event.name,
+        type = event.type,
+        urlEvent = event.urlEvent,
+        locale = event.locale,
+        urlImage = event.urlImage,
+        startDateTime = event.startDateTime,
+        venues = venues.entityToDomains(),
+        eventType = favorites.eventType,
+        countryCode = event.countryCode,
+        idClassification = event.idClassification,
+        page = event.page,
     )
 
 fun Event.domainToEntity(): EventEntity =
@@ -64,7 +65,6 @@ fun Event.domainToEntity(): EventEntity =
         locale = locale,
         urlImage = urlImage,
         startDateTime = startDateTime,
-        eventType = eventType,
         countryCode = countryCode,
         idClassification = idClassification,
         page = page,

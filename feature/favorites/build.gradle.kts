@@ -46,6 +46,8 @@ android {
     kotlinOptions.freeCompilerArgs +=
         listOf(
             "-Xopt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+            "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xopt-in=kotlinx.coroutines.FlowPreview",
         )
 }
 
@@ -60,6 +62,9 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     implementation(libs.timber)
+
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
 
     implementation(project(":core:domain"))
     implementation(project(":core:common"))

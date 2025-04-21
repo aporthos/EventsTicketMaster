@@ -10,4 +10,9 @@ data class EventsWithVenuesEntity(
         entityColumn = "idEventVenues",
     )
     val venues: List<VenuesEntity>,
+    @Relation(
+        parentColumn = "idEvent",
+        entityColumn = "idFavoriteEvent",
+    )
+    val favorite: FavoritesEventEntity?,
 )

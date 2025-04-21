@@ -9,7 +9,7 @@ import com.globant.ticketmaster.core.data.mappers.networkToDomains
 import com.globant.ticketmaster.core.database.EventsTransactions
 import com.globant.ticketmaster.core.database.daos.EventsDao
 import com.globant.ticketmaster.core.database.daos.VenuesDao
-import com.globant.ticketmaster.core.models.entity.EventEntity
+import com.globant.ticketmaster.core.models.entity.EventsWithVenuesEntity
 import com.globant.ticketmaster.core.models.network.events.EventNetwork
 import kotlinx.coroutines.delay
 import retrofit2.HttpException
@@ -23,14 +23,14 @@ class EventsRemoteMediator(
     private val eventsTransactions: EventsTransactions,
     private val eventsDao: EventsDao,
     private val venuesDao: VenuesDao,
-) : RemoteMediator<Int, EventEntity>() {
+) : RemoteMediator<Int, EventsWithVenuesEntity>() {
     companion object {
         private const val STARTING_PAGE_INDEX = 0
     }
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, EventEntity>,
+        state: PagingState<Int, EventsWithVenuesEntity>,
     ): MediatorResult {
         return try {
             val page =
@@ -46,7 +46,8 @@ class EventsRemoteMediator(
                                 ?: return MediatorResult.Success(
                                     endOfPaginationReached = false,
                                 )
-                        lastItem.page + 1
+                        // lastItem.page + 1
+                        0
                     }
                 }
             val response =

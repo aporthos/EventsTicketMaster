@@ -10,4 +10,14 @@ data class LastVisitedWithEventsEntity(
         entityColumn = "idEvent",
     )
     val event: EventEntity,
+    @Relation(
+        parentColumn = "idLastVisitedEvent",
+        entityColumn = "idFavoriteEvent",
+    )
+    val favorite: FavoritesEventEntity?,
+    @Relation(
+        parentColumn = "idLastVisitedEvent",
+        entityColumn = "idEventVenues",
+    )
+    val venues: List<VenuesEntity>,
 )

@@ -13,6 +13,11 @@ interface EventsRepository {
         countryCode: String,
     ): Flow<PagingData<Event>>
 
+    fun getFavoritesEventsPaging(
+        keyword: String,
+        countryCode: String,
+    ): Flow<PagingData<Event>>
+
     fun getEventsPaging(
         countryCode: String,
         keyword: String,
@@ -20,8 +25,6 @@ interface EventsRepository {
     ): Flow<PagingData<Event>>
 
     fun getDetailEvent(idEvent: String): Flow<Event>
-
-    fun getFavoritesEvents(): Flow<List<Event>>
 
     suspend fun setFavoriteEvent(
         idEvent: String,

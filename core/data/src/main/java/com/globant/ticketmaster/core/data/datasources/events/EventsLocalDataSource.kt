@@ -7,10 +7,13 @@ import com.globant.ticketmaster.core.data.mappers.domainToEntities
 import com.globant.ticketmaster.core.data.mappers.entityToDomain
 import com.globant.ticketmaster.core.data.mappers.entityToDomains
 import com.globant.ticketmaster.core.database.daos.EventsDao
+import com.globant.ticketmaster.core.database.daos.FavoritesEventsDao
 import com.globant.ticketmaster.core.database.daos.LastVisitedEventsDao
 import com.globant.ticketmaster.core.database.daos.VenuesDao
 import com.globant.ticketmaster.core.models.domain.Event
 import com.globant.ticketmaster.core.models.entity.EventsWithVenuesEntity
+import com.globant.ticketmaster.core.models.entity.FavoritesEventEntity
+import com.globant.ticketmaster.core.models.entity.FavoritesWithEventsEntity
 import com.globant.ticketmaster.core.models.entity.LastVisitedEventEntity
 import com.globant.ticketmaster.core.models.entity.LastVisitedWithEventsEntity
 import kotlinx.coroutines.CoroutineDispatcher
@@ -27,6 +30,7 @@ class EventsLocalDataSourceImpl
         private val eventsDao: EventsDao,
         private val venuesDao: VenuesDao,
         private val lastVisitedEventsDao: LastVisitedEventsDao,
+        private val favoritesEventsDao: FavoritesEventsDao,
         @IoDispatcher private val dispatcher: CoroutineDispatcher,
     ) : EventsLocalDataSource {
         override fun getLastVisitedEvents(countryCode: String): Flow<List<Event>> =
@@ -44,6 +48,11 @@ class EventsLocalDataSourceImpl
             lastVisitedEventsDao
                 .getLastVisitedEventsPaging(keyword, countryCode)
 
+        override fun getFavoritesEventsPaging(
+            keyword: String,
+            countryCode: String,
+        ): PagingSource<Int, FavoritesWithEventsEntity> = favoritesEventsDao.getFavoritesEventsPaging(keyword, countryCode)
+
         override fun getDetailEvent(idEvent: String): Flow<Event> =
             eventsDao
                 .getEventById(idEvent)
@@ -51,12 +60,6 @@ class EventsLocalDataSourceImpl
                 .catch {
                     throw it
                 }.flowOn(dispatcher)
-
-        override fun getFavoritesEvents(): Flow<List<Event>> =
-            eventsDao
-                .getFavoritesEvents(EventType.Favorite)
-                .map(List<EventsWithVenuesEntity>::entityToDomains)
-                .flowOn(dispatcher)
 
         override fun getSuggestedEvents(ids: List<String>): Flow<List<Event>> =
             eventsDao
@@ -78,7 +81,7 @@ class EventsLocalDataSourceImpl
             eventType: EventType,
         ): Boolean =
             withContext(dispatcher) {
-                eventsDao.updateFavoriteByIdEvent(idEvent, eventType) > 0
+                favoritesEventsDao.insertOrIgnore(FavoritesEventEntity(idEvent, eventType)) > 0
             }
 
         override suspend fun setLastVisitedEvent(
@@ -90,8 +93,7 @@ class EventsLocalDataSourceImpl
                 lastVisitedEventsDao.insertOrIgnore(
                     LastVisitedEventEntity(
                         idLastVisitedEvent = idEvent,
-                        countryCode = countryCode,
-                        lastVisited = lastVisited,
+                        cratedAt = lastVisited,
                     ),
                 ) > 0
             }
@@ -105,9 +107,12 @@ interface EventsLocalDataSource {
         countryCode: String,
     ): PagingSource<Int, LastVisitedWithEventsEntity>
 
-    fun getDetailEvent(idEvent: String): Flow<Event>
+    fun getFavoritesEventsPaging(
+        keyword: String,
+        countryCode: String,
+    ): PagingSource<Int, FavoritesWithEventsEntity>
 
-    fun getFavoritesEvents(): Flow<List<Event>>
+    fun getDetailEvent(idEvent: String): Flow<Event>
 
     fun getSuggestedEvents(ids: List<String>): Flow<List<Event>>
 

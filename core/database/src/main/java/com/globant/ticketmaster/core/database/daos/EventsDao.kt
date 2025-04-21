@@ -27,7 +27,6 @@ interface EventsDao {
         WHERE countryCode = :countryCode 
         AND idClassification LIKE '%' || :idClassification || '%'
         AND name LIKE '%' || :keyword || '%'
-        AND eventType != :eventType
         ORDER BY createdAt ASC
     """,
     )
@@ -35,8 +34,7 @@ interface EventsDao {
         countryCode: String,
         keyword: String,
         idClassification: String,
-        eventType: EventType = EventType.Deleted,
-    ): PagingSource<Int, EventEntity>
+    ): PagingSource<Int, EventsWithVenuesEntity>
 
     @Transaction
     @Query(
@@ -51,15 +49,6 @@ interface EventsDao {
     @Query(
         value = """
             SELECT * FROM events
-            WHERE eventType = :eventType
-    """,
-    )
-    fun getFavoritesEvents(eventType: EventType): Flow<List<EventsWithVenuesEntity>>
-
-    @Transaction
-    @Query(
-        value = """
-            SELECT * FROM events
             WHERE idEvent IN (:ids)
     """,
     )
@@ -67,8 +56,8 @@ interface EventsDao {
 
     @Query(
         value = """
-            UPDATE events SET eventType = :eventType
-            WHERE idEvent = :idEvent
+            UPDATE favoritesEvents SET eventType = :eventType
+            WHERE idFavoriteEvent = :idEvent
     """,
     )
     suspend fun updateFavoriteByIdEvent(
@@ -79,8 +68,8 @@ interface EventsDao {
     @Transaction
     @Query(
         value = """
-        UPDATE events SET eventType = :eventType
-        WHERE idEvent IN (:ids)
+        UPDATE favoritesEvents SET eventType = :eventType
+        WHERE idFavoriteEvent IN (:ids)
     """,
     )
     suspend fun deleteEvents(

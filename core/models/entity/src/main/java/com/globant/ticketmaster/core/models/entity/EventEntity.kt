@@ -2,7 +2,6 @@ package com.globant.ticketmaster.core.models.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.globant.ticketmaster.core.common.EventType
 import java.util.Date
 
 @Entity(
@@ -16,7 +15,6 @@ data class EventEntity(
     val locale: String,
     val urlImage: String,
     val startDateTime: String,
-    val eventType: EventType,
     val countryCode: String,
     val idClassification: String,
     val createdAt: Long = Date().time,

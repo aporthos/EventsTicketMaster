@@ -6,11 +6,13 @@ import androidx.room.TypeConverters
 import com.globant.ticketmaster.core.database.converters.EventTypeConverter
 import com.globant.ticketmaster.core.database.daos.ClassificationsDao
 import com.globant.ticketmaster.core.database.daos.EventsDao
+import com.globant.ticketmaster.core.database.daos.FavoritesEventsDao
 import com.globant.ticketmaster.core.database.daos.LastVisitedEventsDao
 import com.globant.ticketmaster.core.database.daos.SuggestionsEventsDao
 import com.globant.ticketmaster.core.database.daos.VenuesDao
 import com.globant.ticketmaster.core.models.entity.ClassificationsEntity
 import com.globant.ticketmaster.core.models.entity.EventEntity
+import com.globant.ticketmaster.core.models.entity.FavoritesEventEntity
 import com.globant.ticketmaster.core.models.entity.LastVisitedEventEntity
 import com.globant.ticketmaster.core.models.entity.SuggestionEventEntity
 import com.globant.ticketmaster.core.models.entity.VenuesEntity
@@ -22,6 +24,7 @@ import com.globant.ticketmaster.core.models.entity.VenuesEntity
         ClassificationsEntity::class,
         SuggestionEventEntity::class,
         LastVisitedEventEntity::class,
+        FavoritesEventEntity::class,
     ],
     version = 1,
     exportSchema = true,
@@ -41,4 +44,6 @@ abstract class TicketMasterDatabase : RoomDatabase() {
     abstract fun suggestionsEventsDao(): SuggestionsEventsDao
 
     abstract fun lastVisitedEventsDao(): LastVisitedEventsDao
+
+    abstract fun favoritesEventsDao(): FavoritesEventsDao
 }

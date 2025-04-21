@@ -19,8 +19,9 @@ interface LastVisitedEventsDao {
     @Query(
         value = """
             SELECT * FROM lastVisitedEvents
-            WHERE countryCode = :countryCode
-            ORDER BY lastVisited DESC
+            INNER JOIN events ON lastVisitedEvents.idLastVisitedEvent = events.idEvent
+            WHERE events.countryCode = :countryCode
+            ORDER BY lastVisitedEvents.cratedAt DESC
             LIMIT 5
     """,
     )
@@ -31,9 +32,9 @@ interface LastVisitedEventsDao {
         value = """
             SELECT * FROM lastVisitedEvents
             INNER JOIN events ON lastVisitedEvents.idLastVisitedEvent = events.idEvent
-            WHERE lastVisitedEvents.countryCode = :countryCode
+            WHERE events.countryCode = :countryCode
             AND events.name LIKE '%' || :keyword || '%'
-            ORDER BY lastVisited DESC
+            ORDER BY cratedAt DESC
     """,
     )
     fun getLastVisitedEventsPaging(
@@ -43,7 +44,7 @@ interface LastVisitedEventsDao {
 
     @Query(
         value = """
-            UPDATE lastVisitedEvents SET lastVisited = :lastVisited 
+            UPDATE lastVisitedEvents SET cratedAt = :lastVisited 
             WHERE idLastVisitedEvent = :idEvent
     """,
     )

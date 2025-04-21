@@ -15,7 +15,8 @@ import com.globant.ticketmaster.core.database.daos.EventsDao
 import com.globant.ticketmaster.core.database.daos.VenuesDao
 import com.globant.ticketmaster.core.domain.repositories.EventsRepository
 import com.globant.ticketmaster.core.models.domain.Event
-import com.globant.ticketmaster.core.models.entity.EventEntity
+import com.globant.ticketmaster.core.models.entity.EventsWithVenuesEntity
+import com.globant.ticketmaster.core.models.entity.FavoritesWithEventsEntity
 import com.globant.ticketmaster.core.models.entity.LastVisitedWithEventsEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -50,6 +51,20 @@ class EventsRepositoryImpl
                     it.map(LastVisitedWithEventsEntity::entityToDomain)
                 }.flowOn(dispatcher)
 
+        override fun getFavoritesEventsPaging(
+            keyword: String,
+            countryCode: String,
+        ): Flow<PagingData<Event>> =
+            Pager(
+                config = pagerConfig,
+                pagingSourceFactory = {
+                    local.getFavoritesEventsPaging(keyword, countryCode)
+                },
+            ).flow
+                .map {
+                    it.map(FavoritesWithEventsEntity::entityToDomain)
+                }.flowOn(dispatcher)
+
         override fun getEventsPaging(
             countryCode: String,
             keyword: String,
@@ -76,12 +91,10 @@ class EventsRepositoryImpl
                 },
             ).flow
                 .map {
-                    it.map(EventEntity::entityToDomain)
+                    it.map(EventsWithVenuesEntity::entityToDomain)
                 }.flowOn(dispatcher)
 
         override fun getDetailEvent(idEvent: String): Flow<Event> = local.getDetailEvent(idEvent)
-
-        override fun getFavoritesEvents(): Flow<List<Event>> = local.getFavoritesEvents()
 
         override suspend fun setFavoriteEvent(
             idEvent: String,

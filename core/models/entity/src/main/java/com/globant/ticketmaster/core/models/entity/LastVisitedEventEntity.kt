@@ -8,6 +8,5 @@ import androidx.room.PrimaryKey
 )
 data class LastVisitedEventEntity(
     @PrimaryKey val idLastVisitedEvent: String,
-    val countryCode: String,
-    val lastVisited: Long,
+    val cratedAt: Long,
 )

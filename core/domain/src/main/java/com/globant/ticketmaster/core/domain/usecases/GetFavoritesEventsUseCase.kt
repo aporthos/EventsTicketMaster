@@ -1,5 +1,6 @@
 package com.globant.ticketmaster.core.domain.usecases
 
+import androidx.paging.PagingData
 import com.globant.ticketmaster.core.common.FlowSingleUseCase
 import com.globant.ticketmaster.core.common.IoDispatcher
 import com.globant.ticketmaster.core.domain.repositories.EventsRepository
@@ -13,10 +14,12 @@ class GetFavoritesEventsUseCase
     constructor(
         private val eventsRepository: EventsRepository,
         @IoDispatcher private val dispatcher: CoroutineDispatcher,
-    ) : FlowSingleUseCase<GetFavoritesEventsUseCase.Params, List<Event>>(dispatcher) {
+    ) : FlowSingleUseCase<GetFavoritesEventsUseCase.Params, PagingData<Event>>(dispatcher) {
         data class Params(
             val search: String,
+            val countryCode: String,
         )
 
-        override fun execute(params: Params): Flow<List<Event>> = eventsRepository.getFavoritesEvents()
+        override fun execute(params: Params): Flow<PagingData<Event>> =
+            eventsRepository.getFavoritesEventsPaging(params.search, params.countryCode)
     }
