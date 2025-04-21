@@ -21,7 +21,7 @@ class SuggestionsRepositoryImpl
         private val remote: SuggestionsRemoteDataSource,
         private val localEvents: EventsLocalDataSource,
         private val localSuggestions: SuggestionsLocalDataSource,
-        @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+        @IoDispatcher private val dispatcher: CoroutineDispatcher,
     ) : SuggestionsRepository {
         override fun getSuggestions(countryCode: String): Flow<List<Event>> =
             flow {
@@ -41,5 +41,5 @@ class SuggestionsRepositoryImpl
                     }
 //                }
                 emitAll(suggestedEvents)
-            }.flowOn(ioDispatcher)
+            }.flowOn(dispatcher)
     }

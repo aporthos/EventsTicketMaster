@@ -6,12 +6,7 @@ import com.globant.ticketmaster.core.models.domain.Event
 import kotlinx.coroutines.flow.Flow
 
 interface EventsRepository {
-    fun getEvents(
-        countryCode: String,
-        keyword: String,
-        page: Int,
-        idClassification: String,
-    ): Flow<List<Event>>
+    fun getLastVisitedEvents(countryCode: String): Flow<List<Event>>
 
     fun getEventsPaging(
         countryCode: String,
@@ -26,5 +21,11 @@ interface EventsRepository {
     suspend fun setFavoriteEvent(
         idEvent: String,
         eventType: EventType,
+    ): Boolean
+
+    suspend fun setLastVisitedEvent(
+        idEvent: String,
+        lastVisited: Long,
+        countryCode: String,
     ): Boolean
 }

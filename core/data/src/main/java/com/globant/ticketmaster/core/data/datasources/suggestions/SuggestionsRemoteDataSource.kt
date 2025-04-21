@@ -13,10 +13,10 @@ class SuggestionsRemoteDataSourceImpl
     @Inject
     constructor(
         private val apiServices: ApiServices,
-        @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+        @IoDispatcher private val dispatcher: CoroutineDispatcher,
     ) : SuggestionsRemoteDataSource {
         override suspend fun getSuggestionsEvents(countryCode: String): Result<List<Event>> =
-            withContext(ioDispatcher) {
+            withContext(dispatcher) {
                 try {
                     val result = apiServices.getSuggestions(countryCode)
                     Result.success(

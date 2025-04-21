@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import com.globant.ticketmaster.core.common.EventType
 import com.globant.ticketmaster.core.domain.usecases.GetDetailEventUseCase
 import com.globant.ticketmaster.core.domain.usecases.UpdateFavoriteEventUseCase
+import com.globant.ticketmaster.core.domain.usecases.AddLastVisitedEventUseCase
 import com.globant.ticketmaster.core.models.ui.EventUi
 import com.globant.ticketmaster.core.models.ui.domainToUi
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,9 +25,24 @@ class DetailEventViewModel
     constructor(
         savedStateHandle: SavedStateHandle,
         getDetailEventUseCase: GetDetailEventUseCase,
+        addLastVisitedEventUseCase: AddLastVisitedEventUseCase,
         private val updateFavoriteEventUseCase: UpdateFavoriteEventUseCase,
     ) : ViewModel() {
         private val idEvent = savedStateHandle.toRoute<DetailEvent>().idEvent
+
+        init {
+            viewModelScope.launch {
+                addLastVisitedEventUseCase(
+                    AddLastVisitedEventUseCase.Params(
+                        idEvent = idEvent,
+                        lastVisited = Date().time,
+                        countryCode = "MX",
+                    ),
+                ).onFailure {
+                    Timber.e("updateLastVisitedEvent -> $it")
+                }
+            }
+        }
 
         val eventState =
             getDetailEventUseCase(GetDetailEventUseCase.Params(idEvent))

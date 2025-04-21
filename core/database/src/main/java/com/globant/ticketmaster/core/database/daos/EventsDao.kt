@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
 import com.globant.ticketmaster.core.common.EventType
 import com.globant.ticketmaster.core.models.entity.EventEntity
 import com.globant.ticketmaster.core.models.entity.EventsWithVenuesEntity
@@ -16,36 +17,25 @@ interface EventsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrIgnore(entities: List<EventEntity>)
 
-    @Transaction
-    @Query(
-        value = """
-            SELECT * FROM events
-            WHERE countryCode = :countryCode 
-            AND idClassification LIKE :idClassification
-            AND name LIKE :keyword
-            LIMIT 20
-    """,
-    )
-    fun getAllEvents(
-        countryCode: String,
-        keyword: String,
-        idClassification: String,
-    ): Flow<List<EventsWithVenuesEntity>>
+    @Upsert
+    suspend fun upsertAll(beers: List<EventEntity>)
 
     @Transaction
     @Query(
         value = """
         SELECT * FROM events
-            WHERE countryCode = :countryCode 
-            AND idClassification LIKE :idClassification
-            AND name LIKE :keyword 
-            ORDER BY createdAt ASC
+        WHERE countryCode = :countryCode 
+        AND idClassification LIKE :idClassification
+        AND name LIKE :keyword
+        AND eventType != :eventType
+        ORDER BY createdAt ASC
     """,
     )
     fun pagingAllEvents(
         countryCode: String,
         keyword: String,
         idClassification: String,
+        eventType: EventType = EventType.Deleted,
     ): PagingSource<Int, EventEntity>
 
     @Transaction
@@ -77,7 +67,7 @@ interface EventsDao {
 
     @Query(
         value = """
-            UPDATE events SET eventType = :eventType 
+            UPDATE events SET eventType = :eventType
             WHERE idEvent = :idEvent
     """,
     )
@@ -87,6 +77,14 @@ interface EventsDao {
     ): Int
 
     @Transaction
-    @Query("DELETE FROM events")
-    suspend fun deleteAllEvents()
+    @Query(
+        value = """
+        UPDATE events SET eventType = :eventType
+        WHERE idEvent IN (:ids)
+    """,
+    )
+    suspend fun deleteEvents(
+        ids: List<String>,
+        eventType: EventType = EventType.Deleted,
+    )
 }

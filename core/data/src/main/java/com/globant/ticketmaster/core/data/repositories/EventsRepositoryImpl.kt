@@ -8,7 +8,6 @@ import com.globant.ticketmaster.core.common.EventType
 import com.globant.ticketmaster.core.common.IoDispatcher
 import com.globant.ticketmaster.core.data.ApiServices
 import com.globant.ticketmaster.core.data.datasources.events.EventsLocalDataSource
-import com.globant.ticketmaster.core.data.datasources.events.EventsRemoteDataSource
 import com.globant.ticketmaster.core.data.datasources.events.EventsRemoteMediator
 import com.globant.ticketmaster.core.data.mappers.entityToDomain
 import com.globant.ticketmaster.core.database.EventsTransactions
@@ -19,11 +18,8 @@ import com.globant.ticketmaster.core.models.domain.Event
 import com.globant.ticketmaster.core.models.entity.EventEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import timber.log.Timber
 import javax.inject.Inject
 
 class EventsRepositoryImpl
@@ -33,43 +29,10 @@ class EventsRepositoryImpl
         private val venuesDao: VenuesDao,
         private val eventsTransactions: EventsTransactions,
         private val local: EventsLocalDataSource,
-        private val remote: EventsRemoteDataSource,
         private val apiServices: ApiServices,
-        @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+        @IoDispatcher private val dispatcher: CoroutineDispatcher,
     ) : EventsRepository {
-        override fun getEvents(
-            countryCode: String,
-            keyword: String,
-            page: Int,
-            idClassification: String,
-        ): Flow<List<Event>> =
-            flow {
-                val localEvents =
-                    local.getEvents(
-                        countryCode = countryCode,
-                        keyword = keyword,
-                        idClassification = idClassification,
-                    )
-
-                // TODO: Fix sync remote/local
-//                if (localEvents.first().isEmpty()) {
-                val result =
-                    remote.getEvents(
-                        countryCode = countryCode,
-                        keyword = keyword,
-                        page = page,
-                        idClassification = idClassification,
-                    )
-                result
-                    .onSuccess {
-                        Timber.i("getEvents ${it.size}")
-                        local.addEvents(it)
-                    }.onFailure {
-                        Timber.e("getEvents -> $it")
-                    }
-//                }
-                emitAll(localEvents)
-            }.flowOn(ioDispatcher)
+        override fun getLastVisitedEvents(countryCode: String): Flow<List<Event>> = local.getLastVisitedEvents(countryCode)
 
         override fun getEventsPaging(
             countryCode: String,
@@ -95,9 +58,10 @@ class EventsRepositoryImpl
                         idClassification = search(idClassification),
                     )
                 },
-            ).flow.map {
-                it.map(EventEntity::entityToDomain)
-            }
+            ).flow
+                .map {
+                    it.map(EventEntity::entityToDomain)
+                }.flowOn(dispatcher)
 
         override fun getDetailEvent(idEvent: String): Flow<Event> = local.getDetailEvent(idEvent)
 
@@ -107,6 +71,17 @@ class EventsRepositoryImpl
             idEvent: String,
             eventType: EventType,
         ): Boolean = local.setFavoriteEvent(idEvent, eventType)
+
+        override suspend fun setLastVisitedEvent(
+            idEvent: String,
+            lastVisited: Long,
+            countryCode: String,
+        ): Boolean =
+            local.setLastVisitedEvent(
+                idEvent = idEvent,
+                lastVisited = lastVisited,
+                countryCode = countryCode,
+            )
 
         private fun search(keyword: String): String =
             if (keyword.isEmpty()) {

@@ -2,4 +2,5 @@
 <resources>
     <string name="title_events">Eventos</string>
     <string name="section_suggestions">Sugerencias</string>
+    <string name="section_last_visited">Ultimos visitados</string>
 </resources>

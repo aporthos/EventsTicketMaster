@@ -6,9 +6,12 @@ import com.globant.ticketmaster.core.data.mappers.domainToEntities
 import com.globant.ticketmaster.core.data.mappers.entityToDomain
 import com.globant.ticketmaster.core.data.mappers.entityToDomains
 import com.globant.ticketmaster.core.database.daos.EventsDao
+import com.globant.ticketmaster.core.database.daos.LastVisitedEventsDao
 import com.globant.ticketmaster.core.database.daos.VenuesDao
 import com.globant.ticketmaster.core.models.domain.Event
 import com.globant.ticketmaster.core.models.entity.EventsWithVenuesEntity
+import com.globant.ticketmaster.core.models.entity.LastVisitedEventEntity
+import com.globant.ticketmaster.core.models.entity.LastVisitedWithEventsEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -22,19 +25,15 @@ class EventsLocalDataSourceImpl
     constructor(
         private val eventsDao: EventsDao,
         private val venuesDao: VenuesDao,
+        private val lastVisitedEventsDao: LastVisitedEventsDao,
         @IoDispatcher private val dispatcher: CoroutineDispatcher,
     ) : EventsLocalDataSource {
-        override fun getEvents(
-            countryCode: String,
-            keyword: String,
-            idClassification: String,
-        ): Flow<List<Event>> =
-            eventsDao
-                .getAllEvents(
-                    countryCode = countryCode,
-                    keyword = search(keyword),
-                    idClassification = search(idClassification),
-                ).map(List<EventsWithVenuesEntity>::entityToDomains)
+        override fun getLastVisitedEvents(countryCode: String): Flow<List<Event>> =
+            lastVisitedEventsDao
+                .getLastVisitedEvents(countryCode)
+                .catch {
+                    throw it
+                }.map(List<LastVisitedWithEventsEntity>::entityToDomains)
                 .flowOn(dispatcher)
 
         override fun getDetailEvent(idEvent: String): Flow<Event> =
@@ -74,20 +73,24 @@ class EventsLocalDataSourceImpl
                 eventsDao.updateFavoriteByIdEvent(idEvent, eventType) > 0
             }
 
-        private fun search(keyword: String): String =
-            if (keyword.isEmpty()) {
-                "%%"
-            } else {
-                "%$keyword%"
+        override suspend fun setLastVisitedEvent(
+            idEvent: String,
+            lastVisited: Long,
+            countryCode: String,
+        ): Boolean =
+            withContext(dispatcher) {
+                lastVisitedEventsDao.insertOrIgnore(
+                    LastVisitedEventEntity(
+                        idLastVisitedEvent = idEvent,
+                        countryCode = countryCode,
+                        lastVisited = lastVisited,
+                    ),
+                ) > 0
             }
     }
 
 interface EventsLocalDataSource {
-    fun getEvents(
-        countryCode: String,
-        keyword: String,
-        idClassification: String,
-    ): Flow<List<Event>>
+    fun getLastVisitedEvents(countryCode: String): Flow<List<Event>>
 
     fun getDetailEvent(idEvent: String): Flow<Event>
 
@@ -100,5 +103,11 @@ interface EventsLocalDataSource {
     suspend fun setFavoriteEvent(
         idEvent: String,
         eventType: EventType,
+    ): Boolean
+
+    suspend fun setLastVisitedEvent(
+        idEvent: String,
+        lastVisited: Long,
+        countryCode: String,
     ): Boolean
 }

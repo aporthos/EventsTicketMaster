@@ -4,6 +4,7 @@ import com.globant.ticketmaster.core.common.EventType
 import com.globant.ticketmaster.core.models.domain.Event
 import com.globant.ticketmaster.core.models.entity.EventEntity
 import com.globant.ticketmaster.core.models.entity.EventsWithVenuesEntity
+import com.globant.ticketmaster.core.models.entity.LastVisitedWithEventsEntity
 import com.globant.ticketmaster.core.models.network.events.EventNetwork
 
 fun EventsWithVenuesEntity.entityToDomain(): Event =
@@ -16,6 +17,22 @@ fun EventsWithVenuesEntity.entityToDomain(): Event =
         urlImage = event.urlImage,
         startDateTime = event.startDateTime,
         venues = venues.entityToDomains(),
+        eventType = event.eventType,
+        countryCode = event.countryCode,
+        idClassification = event.idClassification,
+        page = event.page,
+    )
+
+fun LastVisitedWithEventsEntity.entityToDomain(): Event =
+    Event(
+        idEvent = event.idEvent,
+        name = event.name,
+        type = event.type,
+        urlEvent = event.urlEvent,
+        locale = event.locale,
+        urlImage = event.urlImage,
+        startDateTime = event.startDateTime,
+        venues = emptyList(),
         eventType = event.eventType,
         countryCode = event.countryCode,
         idClassification = event.idClassification,
@@ -87,6 +104,10 @@ fun List<EventNetwork>.networkToDomains(
         event.networkToDomain(eventType = eventType, countryCode = countryCode, page = page)
     }
 
+@JvmName("EventsWithVenuesEntity")
 fun List<EventsWithVenuesEntity>.entityToDomains(): List<Event> = map(EventsWithVenuesEntity::entityToDomain)
+
+@JvmName("lastVisitedWithEventsEntity")
+fun List<LastVisitedWithEventsEntity>.entityToDomains(): List<Event> = map(LastVisitedWithEventsEntity::entityToDomain)
 
 fun List<Event>.domainToEntities(): List<EventEntity> = map(Event::domainToEntity)

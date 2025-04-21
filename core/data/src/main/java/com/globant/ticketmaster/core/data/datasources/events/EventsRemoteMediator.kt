@@ -87,7 +87,7 @@ class EventsRemoteMediator(
                     events
                         .flatMap { it.venues.domainToEntities(it.idEvent) }
                         .map { it.idEventVenues }
-                eventsDao.deleteAllEvents()
+                eventsDao.deleteEvents(events.map { it.idEvent })
                 venuesDao.deleteVenuesByIdEvent(venues)
             },
             insertOperation = {

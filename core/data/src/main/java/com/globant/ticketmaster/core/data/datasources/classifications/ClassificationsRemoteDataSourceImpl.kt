@@ -13,10 +13,10 @@ class ClassificationsRemoteDataSourceImpl
     @Inject
     constructor(
         private val apiServices: ApiServices,
-        @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+        @IoDispatcher private val dispatcher: CoroutineDispatcher,
     ) : ClassificationsRemoteDataSource {
         override suspend fun getClassifications(): Result<List<Classification>> =
-            withContext(ioDispatcher) {
+            withContext(dispatcher) {
                 try {
                     val result = apiServices.getClassifications()
                     val classifications =

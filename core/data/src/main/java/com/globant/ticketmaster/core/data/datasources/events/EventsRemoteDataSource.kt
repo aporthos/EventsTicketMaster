@@ -13,7 +13,7 @@ class EventsRemoteDataSourceImpl
     @Inject
     constructor(
         private val apiServices: ApiServices,
-        @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+        @IoDispatcher private val dispatcher: CoroutineDispatcher,
     ) : EventsRemoteDataSource {
         override suspend fun getEvents(
             countryCode: String,
@@ -21,7 +21,7 @@ class EventsRemoteDataSourceImpl
             page: Int,
             idClassification: String,
         ): Result<List<Event>> =
-            withContext(ioDispatcher) {
+            withContext(dispatcher) {
                 try {
                     val result =
                         apiServices.getEvents(

@@ -8,24 +8,15 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetEventsUseCase
+class GetLastVisitedEventsUseCase
     @Inject
     constructor(
         private val repository: EventsRepository,
         @IoDispatcher private val dispatcher: CoroutineDispatcher,
-    ) : FlowSingleUseCase<GetEventsUseCase.Params, List<Event>>(dispatcher) {
+    ) : FlowSingleUseCase<GetLastVisitedEventsUseCase.Params, List<Event>>(dispatcher) {
         data class Params(
             val countryCode: String,
-            val keyword: String,
-            val page: Int,
-            val idClassification: String,
         )
 
-        override fun execute(params: Params): Flow<List<Event>> =
-            repository.getEvents(
-                countryCode = params.countryCode,
-                keyword = params.keyword,
-                page = params.page,
-                idClassification = params.idClassification,
-            )
+        override fun execute(params: Params): Flow<List<Event>> = repository.getLastVisitedEvents(countryCode = params.countryCode)
     }

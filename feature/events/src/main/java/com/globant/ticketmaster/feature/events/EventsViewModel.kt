@@ -29,7 +29,8 @@ class EventsViewModel
             getSuggestionsEventsUseCase(GetSuggestionsUseCase.Params("MX"))
                 .map { result ->
                     EventsUiState.Items(
-                        suggestionsEvents = result.domainToUis(),
+                        suggestionsEvents = result.suggestionsEvents.domainToUis(),
+                        lastVisitedEvents = result.lastVisitedEvents.domainToUis(),
                     )
                 }.stateIn(
                     scope = viewModelScope,

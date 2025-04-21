@@ -19,7 +19,7 @@ class ClassificationsRepositoryImpl
     constructor(
         private val local: ClassificationsLocalDataSource,
         private val remote: ClassificationsRemoteDataSource,
-        @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+        @IoDispatcher private val dispatcher: CoroutineDispatcher,
     ) : ClassificationsRepository {
         override fun getClassifications(): Flow<List<Classification>> =
             flow {
@@ -36,5 +36,5 @@ class ClassificationsRepositoryImpl
                 }
 
                 emitAll(cache)
-            }.flowOn(ioDispatcher)
+            }.flowOn(dispatcher)
     }

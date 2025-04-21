@@ -100,13 +100,29 @@ fun SectionEvents(
         EventsUiState.Loading -> LoadingScreen()
 
         is EventsUiState.Items -> {
-            Text(
-                modifier = Modifier.padding(horizontal = 8.dp),
-                text = stringResource(R.string.section_suggestions),
-                style = MaterialTheme.typography.titleLarge,
-            )
             LazyColumn {
-                items(eventsState.suggestionsEvents, key = { it.idEvent }) { item ->
+                item {
+                    if (eventsState.lastVisitedEvents.isNotEmpty()) {
+                        Text(
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                            text = stringResource(R.string.section_last_visited),
+                            style = MaterialTheme.typography.titleLarge,
+                        )
+                    }
+                }
+
+                items(eventsState.lastVisitedEvents) { item ->
+                    EventItem(item, onEventClick, onFavoriteClick)
+                }
+
+                item {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        text = stringResource(R.string.section_suggestions),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                }
+                items(eventsState.suggestionsEvents) { item ->
                     EventItem(item, onEventClick, onFavoriteClick)
                 }
             }

@@ -6,6 +6,7 @@ import com.globant.ticketmaster.core.models.ui.EventUi
 sealed interface EventsUiState {
     data class Items(
         val suggestionsEvents: List<EventUi>,
+        val lastVisitedEvents: List<EventUi>,
     ) : EventsUiState
 
     data object Error : EventsUiState

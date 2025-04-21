@@ -7,6 +7,7 @@ import com.globant.ticketmaster.core.database.EventsTransactionsImpl
 import com.globant.ticketmaster.core.database.TicketMasterDatabase
 import com.globant.ticketmaster.core.database.daos.ClassificationsDao
 import com.globant.ticketmaster.core.database.daos.EventsDao
+import com.globant.ticketmaster.core.database.daos.LastVisitedEventsDao
 import com.globant.ticketmaster.core.database.daos.SuggestionsEventsDao
 import com.globant.ticketmaster.core.database.daos.VenuesDao
 import dagger.Binds
@@ -51,6 +52,10 @@ interface DatabaseModule {
         @Provides
         @Singleton
         fun providesSuggestionsEventsDao(database: TicketMasterDatabase): SuggestionsEventsDao = database.suggestionsEventsDao()
+
+        @Provides
+        @Singleton
+        fun providesLastVisitedEventsDao(database: TicketMasterDatabase): LastVisitedEventsDao = database.lastVisitedEventsDao()
     }
 
     @Binds
