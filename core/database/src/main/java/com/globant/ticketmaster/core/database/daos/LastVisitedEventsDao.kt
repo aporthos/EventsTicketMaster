@@ -1,5 +1,6 @@
 package com.globant.ticketmaster.core.database.daos
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -24,6 +25,21 @@ interface LastVisitedEventsDao {
     """,
     )
     fun getLastVisitedEvents(countryCode: String): Flow<List<LastVisitedWithEventsEntity>>
+
+    @Transaction
+    @Query(
+        value = """
+            SELECT * FROM lastVisitedEvents
+            INNER JOIN events ON lastVisitedEvents.idLastVisitedEvent = events.idEvent
+            WHERE lastVisitedEvents.countryCode = :countryCode
+            AND events.name LIKE '%' || :keyword || '%'
+            ORDER BY lastVisited DESC
+    """,
+    )
+    fun getLastVisitedEventsPaging(
+        keyword: String,
+        countryCode: String,
+    ): PagingSource<Int, LastVisitedWithEventsEntity>
 
     @Query(
         value = """

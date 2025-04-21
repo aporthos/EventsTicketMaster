@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +17,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,6 +39,7 @@ fun EventsRoute(
     onEventClick: (EventUi) -> Unit,
     onSearchClick: () -> Unit,
     onClassificationClick: (Classification) -> Unit,
+    onLastVisitedClick: () -> Unit,
     viewModel: EventsViewModel = hiltViewModel(),
 ) {
     val eventsState by viewModel.suggestionsEventsState.collectAsStateWithLifecycle()
@@ -48,6 +51,7 @@ fun EventsRoute(
         onClassificationClick = onClassificationClick,
         onSearchClick = onSearchClick,
         onFavoriteClick = viewModel::updateFavoriteEvent,
+        onLastVisitedClick = onLastVisitedClick,
     )
 }
 
@@ -59,6 +63,7 @@ fun EventsRoute(
     onFavoriteClick: (EventUi) -> Unit,
     onSearchClick: () -> Unit,
     onClassificationClick: (Classification) -> Unit,
+    onLastVisitedClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -81,7 +86,12 @@ fun EventsRoute(
                 modifier = Modifier.padding(paddingValues),
             ) {
                 SectionClassifications(classificationsState, onClassificationClick)
-                SectionEvents(eventsState, onEventClick, onFavoriteClick)
+                SectionEvents(
+                    eventsState = eventsState,
+                    onEventClick = onEventClick,
+                    onFavoriteClick = onFavoriteClick,
+                    onLastVisitedClick = onLastVisitedClick,
+                )
             }
         },
     )
@@ -92,6 +102,7 @@ fun SectionEvents(
     eventsState: EventsUiState,
     onEventClick: (EventUi) -> Unit,
     onFavoriteClick: (EventUi) -> Unit,
+    onLastVisitedClick: () -> Unit,
 ) {
     when (eventsState) {
         EventsUiState.Error -> {
@@ -103,11 +114,22 @@ fun SectionEvents(
             LazyColumn {
                 item {
                     if (eventsState.lastVisitedEvents.isNotEmpty()) {
-                        Text(
+                        Row(
                             modifier = Modifier.padding(horizontal = 8.dp),
-                            text = stringResource(R.string.section_last_visited),
-                            style = MaterialTheme.typography.titleLarge,
-                        )
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                modifier = Modifier.weight(1f),
+                                text = stringResource(R.string.section_last_visited),
+                                style = MaterialTheme.typography.titleLarge,
+                            )
+                            TextButton(onClick = { onLastVisitedClick() }) {
+                                Text(
+                                    text = stringResource(R.string.section_view_more),
+                                    style = MaterialTheme.typography.labelLarge,
+                                )
+                            }
+                        }
                     }
                 }
 

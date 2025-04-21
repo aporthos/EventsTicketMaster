@@ -1,5 +1,6 @@
 package com.globant.ticketmaster.core.data.di
 
+import androidx.paging.PagingConfig
 import com.globant.ticketmaster.core.data.ApiServices
 import com.globant.ticketmaster.core.data.datasources.classifications.ClassificationsLocalDataSource
 import com.globant.ticketmaster.core.data.datasources.classifications.ClassificationsLocalDataSourceImpl
@@ -31,9 +32,22 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 interface DataModule {
     companion object {
+        private const val PAGE_SIZE = 20
+        private const val PREFETCH_DISTANCE = 1
+
         @Singleton
         @Provides
         fun providesService(retrofit: Retrofit): ApiServices = retrofit.create(ApiServices::class.java)
+
+        @Singleton
+        @Provides
+        fun providesPagerConfig(): PagingConfig =
+            PagingConfig(
+                pageSize = PAGE_SIZE,
+                initialLoadSize = PAGE_SIZE,
+                prefetchDistance = PREFETCH_DISTANCE,
+                enablePlaceholders = false,
+            )
     }
 
     @Binds

@@ -1,5 +1,6 @@
-package com.globant.ticketmaster.core.domain.usecases
+package com.globant.ticketmaster.core.domain.usecases.lastvisited
 
+import androidx.paging.PagingData
 import com.globant.ticketmaster.core.common.FlowSingleUseCase
 import com.globant.ticketmaster.core.common.IoDispatcher
 import com.globant.ticketmaster.core.domain.repositories.EventsRepository
@@ -8,15 +9,20 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetLastVisitedEventsUseCase
+class GetLastVisitedEventsPagingUseCase
     @Inject
     constructor(
         private val repository: EventsRepository,
         @IoDispatcher private val dispatcher: CoroutineDispatcher,
-    ) : FlowSingleUseCase<GetLastVisitedEventsUseCase.Params, List<Event>>(dispatcher) {
+    ) : FlowSingleUseCase<GetLastVisitedEventsPagingUseCase.Params, PagingData<Event>>(dispatcher) {
         data class Params(
+            val keyword: String,
             val countryCode: String,
         )
 
-        override fun execute(params: Params): Flow<List<Event>> = repository.getLastVisitedEvents(countryCode = params.countryCode)
+        override fun execute(params: Params): Flow<PagingData<Event>> =
+            repository.getLastVisitedEventsPaging(
+                countryCode = params.countryCode,
+                keyword = params.keyword,
+            )
     }

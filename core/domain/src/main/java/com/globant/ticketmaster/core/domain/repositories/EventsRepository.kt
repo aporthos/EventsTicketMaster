@@ -8,6 +8,11 @@ import kotlinx.coroutines.flow.Flow
 interface EventsRepository {
     fun getLastVisitedEvents(countryCode: String): Flow<List<Event>>
 
+    fun getLastVisitedEventsPaging(
+        keyword: String,
+        countryCode: String,
+    ): Flow<PagingData<Event>>
+
     fun getEventsPaging(
         countryCode: String,
         keyword: String,

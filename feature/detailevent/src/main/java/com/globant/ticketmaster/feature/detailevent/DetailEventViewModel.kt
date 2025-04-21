@@ -7,7 +7,7 @@ import androidx.navigation.toRoute
 import com.globant.ticketmaster.core.common.EventType
 import com.globant.ticketmaster.core.domain.usecases.GetDetailEventUseCase
 import com.globant.ticketmaster.core.domain.usecases.UpdateFavoriteEventUseCase
-import com.globant.ticketmaster.core.domain.usecases.AddLastVisitedEventUseCase
+import com.globant.ticketmaster.core.domain.usecases.lastvisited.AddLastVisitedEventUseCase
 import com.globant.ticketmaster.core.models.ui.EventUi
 import com.globant.ticketmaster.core.models.ui.domainToUi
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -13,7 +13,6 @@ import com.globant.ticketmaster.core.models.entity.EventEntity
 import com.globant.ticketmaster.core.models.network.events.EventNetwork
 import kotlinx.coroutines.delay
 import retrofit2.HttpException
-import timber.log.Timber
 import java.io.IOException
 
 class EventsRemoteMediator(
@@ -61,8 +60,6 @@ class EventsRemoteMediator(
             delay(3_000L)
             val events = response.embedded?.events ?: emptyList()
             executeTransactions(loadType, page, events)
-
-            Timber.i("load page $page totalPages ${response.page?.totalPages}")
             MediatorResult.Success(
                 endOfPaginationReached = response.page?.totalPages == page,
             )

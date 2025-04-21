@@ -16,6 +16,7 @@ import com.globant.ticketmaster.core.database.daos.VenuesDao
 import com.globant.ticketmaster.core.domain.repositories.EventsRepository
 import com.globant.ticketmaster.core.models.domain.Event
 import com.globant.ticketmaster.core.models.entity.EventEntity
+import com.globant.ticketmaster.core.models.entity.LastVisitedWithEventsEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -30,9 +31,24 @@ class EventsRepositoryImpl
         private val eventsTransactions: EventsTransactions,
         private val local: EventsLocalDataSource,
         private val apiServices: ApiServices,
+        private val pagerConfig: PagingConfig,
         @IoDispatcher private val dispatcher: CoroutineDispatcher,
     ) : EventsRepository {
         override fun getLastVisitedEvents(countryCode: String): Flow<List<Event>> = local.getLastVisitedEvents(countryCode)
+
+        override fun getLastVisitedEventsPaging(
+            keyword: String,
+            countryCode: String,
+        ): Flow<PagingData<Event>> =
+            Pager(
+                config = pagerConfig,
+                pagingSourceFactory = {
+                    local.getLastVisitedEventsPaging(keyword, countryCode)
+                },
+            ).flow
+                .map {
+                    it.map(LastVisitedWithEventsEntity::entityToDomain)
+                }.flowOn(dispatcher)
 
         override fun getEventsPaging(
             countryCode: String,
@@ -40,7 +56,7 @@ class EventsRepositoryImpl
             idClassification: String,
         ): Flow<PagingData<Event>> =
             Pager(
-                config = PagingConfig(pageSize = 20),
+                config = pagerConfig,
                 remoteMediator =
                     EventsRemoteMediator(
                         countryCode = countryCode,
@@ -54,8 +70,8 @@ class EventsRepositoryImpl
                 pagingSourceFactory = {
                     eventsDao.pagingAllEvents(
                         countryCode = countryCode,
-                        keyword = search(keyword),
-                        idClassification = search(idClassification),
+                        keyword = keyword,
+                        idClassification = idClassification,
                     )
                 },
             ).flow

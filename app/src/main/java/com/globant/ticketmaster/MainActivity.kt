@@ -21,6 +21,8 @@ import com.globant.ticketmaster.feature.detailevent.DetailEvent
 import com.globant.ticketmaster.feature.detailevent.DetailEventRoute
 import com.globant.ticketmaster.feature.events.EventsRoute
 import com.globant.ticketmaster.feature.favorites.FavoritesRoute
+import com.globant.ticketmaster.feature.lastvisited.LastVisited
+import com.globant.ticketmaster.feature.lastvisited.LastVisitedRoute
 import com.globant.ticketmaster.feature.searchevent.SearchEvents
 import com.globant.ticketmaster.feature.searchevent.SearchEventsRoute
 import dagger.hilt.android.AndroidEntryPoint
@@ -59,6 +61,9 @@ fun TicketMasterAppNavHost(appState: TicketMasterAppState) {
                 onSearchClick = {
                     appState.navigateToSearchEvents(SearchEvents(""))
                 },
+                onLastVisitedClick = {
+                    appState.navigateToLastVisitedEvent(LastVisited)
+                },
             )
         }
 
@@ -75,6 +80,15 @@ fun TicketMasterAppNavHost(appState: TicketMasterAppState) {
                 onBackClick = appState::upPress,
             )
         }
+
+        composable<LastVisited> {
+            LastVisitedRoute(
+                onBackClick = appState::upPress,
+                onEventClick = {
+                    appState.navigateToDetailEvent(DetailEvent(it.idEvent, it.name))
+                },
+            )
+        }
     }
 }
 
@@ -84,6 +98,7 @@ fun HomeMainContainer(
     onEventClick: (EventUi) -> Unit,
     onSearchClick: () -> Unit,
     onClassificationClick: (Classification) -> Unit,
+    onLastVisitedClick: () -> Unit,
 ) {
     val appState = rememberTicketMasterAppState()
     val backStackEntry by appState.navController.currentBackStackEntryAsState()
@@ -107,6 +122,7 @@ fun HomeMainContainer(
                     onEventClick = onEventClick,
                     onSearchClick = onSearchClick,
                     onClassificationClick = onClassificationClick,
+                    onLastVisitedClick = onLastVisitedClick,
                 )
             }
             composable(HomeSections.Favorites.route) {

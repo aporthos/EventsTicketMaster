@@ -25,8 +25,8 @@ interface EventsDao {
         value = """
         SELECT * FROM events
         WHERE countryCode = :countryCode 
-        AND idClassification LIKE :idClassification
-        AND name LIKE :keyword
+        AND idClassification LIKE '%' || :idClassification || '%'
+        AND name LIKE '%' || :keyword || '%'
         AND eventType != :eventType
         ORDER BY createdAt ASC
     """,

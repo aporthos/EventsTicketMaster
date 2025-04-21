@@ -1,4 +1,4 @@
-package com.globant.ticketmaster.core.domain.usecases
+package com.globant.ticketmaster.core.domain.usecases.lastvisited
 
 import com.globant.ticketmaster.core.common.IoDispatcher
 import com.globant.ticketmaster.core.common.UseCase

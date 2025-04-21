@@ -1,5 +1,6 @@
 package com.globant.ticketmaster.core.data.datasources.events
 
+import androidx.paging.PagingSource
 import com.globant.ticketmaster.core.common.EventType
 import com.globant.ticketmaster.core.common.IoDispatcher
 import com.globant.ticketmaster.core.data.mappers.domainToEntities
@@ -35,6 +36,13 @@ class EventsLocalDataSourceImpl
                     throw it
                 }.map(List<LastVisitedWithEventsEntity>::entityToDomains)
                 .flowOn(dispatcher)
+
+        override fun getLastVisitedEventsPaging(
+            keyword: String,
+            countryCode: String,
+        ): PagingSource<Int, LastVisitedWithEventsEntity> =
+            lastVisitedEventsDao
+                .getLastVisitedEventsPaging(keyword, countryCode)
 
         override fun getDetailEvent(idEvent: String): Flow<Event> =
             eventsDao
@@ -91,6 +99,11 @@ class EventsLocalDataSourceImpl
 
 interface EventsLocalDataSource {
     fun getLastVisitedEvents(countryCode: String): Flow<List<Event>>
+
+    fun getLastVisitedEventsPaging(
+        keyword: String,
+        countryCode: String,
+    ): PagingSource<Int, LastVisitedWithEventsEntity>
 
     fun getDetailEvent(idEvent: String): Flow<Event>
 
