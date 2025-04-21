@@ -1,5 +1,6 @@
 package com.globant.ticketmaster.core.domain.usecases
 
+import androidx.paging.PagingData
 import com.globant.ticketmaster.core.common.FlowSingleUseCase
 import com.globant.ticketmaster.core.common.IoDispatcher
 import com.globant.ticketmaster.core.domain.repositories.EventsRepository
@@ -8,24 +9,22 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetEventsUseCase
+class GetEventsPagingUseCase
     @Inject
     constructor(
         private val repository: EventsRepository,
         @IoDispatcher private val dispatcher: CoroutineDispatcher,
-    ) : FlowSingleUseCase<GetEventsUseCase.Params, List<Event>>(dispatcher) {
+    ) : FlowSingleUseCase<GetEventsPagingUseCase.Params, PagingData<Event>>(dispatcher) {
         data class Params(
             val countryCode: String,
             val keyword: String,
-            val page: Int,
             val idClassification: String,
         )
 
-        override fun execute(params: Params): Flow<List<Event>> =
-            repository.getEvents(
+        override fun execute(params: Params): Flow<PagingData<Event>> =
+            repository.getEventsPaging(
                 countryCode = params.countryCode,
                 keyword = params.keyword,
-                page = params.page,
                 idClassification = params.idClassification,
             )
     }

@@ -49,9 +49,11 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.paging)
 
     implementation(libs.squareup.moshi)
     implementation(libs.squareup.moshi.kotlin)
+    implementation(libs.androidx.paging.runtime)
 
     implementation(project(":core:models:entity"))
     implementation(project(":core:common"))

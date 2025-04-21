@@ -1,8 +1,8 @@
 package com.globant.ticketmaster.core.data.repositories
 
 import com.globant.ticketmaster.core.common.IoDispatcher
-import com.globant.ticketmaster.core.data.datasources.ClassificationsLocalDataSource
-import com.globant.ticketmaster.core.data.datasources.ClassificationsRemoteDataSource
+import com.globant.ticketmaster.core.data.datasources.classifications.ClassificationsLocalDataSource
+import com.globant.ticketmaster.core.data.datasources.classifications.ClassificationsRemoteDataSource
 import com.globant.ticketmaster.core.domain.repositories.ClassificationsRepository
 import com.globant.ticketmaster.core.models.domain.Classification
 import kotlinx.coroutines.CoroutineDispatcher

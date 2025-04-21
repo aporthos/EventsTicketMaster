@@ -1,4 +1,4 @@
-package com.globant.ticketmaster.core.data.datasources
+package com.globant.ticketmaster.core.data.datasources.suggestions
 
 import com.globant.ticketmaster.core.common.IoDispatcher
 import com.globant.ticketmaster.core.database.daos.SuggestionsEventsDao

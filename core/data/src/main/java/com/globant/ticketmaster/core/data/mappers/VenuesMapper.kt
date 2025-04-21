@@ -2,6 +2,7 @@ package com.globant.ticketmaster.core.data.mappers
 
 import com.globant.ticketmaster.core.models.domain.Location
 import com.globant.ticketmaster.core.models.domain.Venues
+import com.globant.ticketmaster.core.models.entity.LocationEntity
 import com.globant.ticketmaster.core.models.entity.VenuesEntity
 import com.globant.ticketmaster.core.models.network.events.VenuesNetwork
 
@@ -15,6 +16,19 @@ fun VenuesNetwork.networkToDomain(): Venues =
         country = country?.name.orEmpty(),
         address = address?.address.orEmpty(),
         location = location?.networkToDomain() ?: Location(0.0, 0.0),
+    )
+
+fun VenuesNetwork.networkToEntity(idEvent: String): VenuesEntity =
+    VenuesEntity(
+        idVenue = idVenue.orEmpty(),
+        name = name.orEmpty(),
+        idEventVenues = idEvent,
+        urlVenue = urlVenue.orEmpty(),
+        city = city?.name.orEmpty(),
+        state = state?.name.orEmpty(),
+        country = country?.name.orEmpty(),
+        address = address?.address.orEmpty(),
+        location = location?.networkToEntity() ?: LocationEntity(0.0, 0.0),
     )
 
 fun Venues.domainToEntity(idEvent: String): VenuesEntity =

@@ -20,4 +20,12 @@ interface VenuesDao {
     """,
     )
     fun getAllVenues(): Flow<List<VenuesEntity>>
+
+    @Transaction
+    @Query(
+        value = """
+        DELETE FROM venues WHERE idEventVenues IN (:idEvent)
+    """,
+    )
+    suspend fun deleteVenuesByIdEvent(idEvent: List<String>)
 }

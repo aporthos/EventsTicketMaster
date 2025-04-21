@@ -14,4 +14,5 @@ data class Event(
     val eventType: EventType,
     val countryCode: String,
     val idClassification: String,
+    val page: Int,
 )

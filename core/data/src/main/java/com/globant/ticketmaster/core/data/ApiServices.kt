@@ -11,6 +11,7 @@ interface ApiServices {
     suspend fun getEvents(
         @Query("countryCode") countryCode: String,
         @Query("keyword") keyword: String,
+        @Query("page") page: Int,
         @Query("classificationId") idClassification: String,
     ): BaseResponseNetwork<EventNetwork>
 

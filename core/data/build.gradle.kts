@@ -41,6 +41,7 @@ android {
     kotlinOptions.freeCompilerArgs +=
         listOf(
             "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xopt-in=androidx.paging.ExperimentalPagingApi",
         )
 }
 
@@ -60,6 +61,7 @@ dependencies {
     kapt(libs.squareup.moshi.codegen)
 
     implementation(libs.timber)
+    implementation(libs.androidx.paging.runtime)
 
     implementation(project(":core:domain"))
     implementation(project(":core:database"))

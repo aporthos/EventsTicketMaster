@@ -27,7 +27,7 @@ fun LoadingScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(Designsystem.raw.nothing))
+        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(Designsystem.raw.loading))
         val progress by animateLottieCompositionAsState(
             composition = composition,
             iterations = 1,

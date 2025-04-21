@@ -1,4 +1,4 @@
-package com.globant.ticketmaster.core.data.datasources
+package com.globant.ticketmaster.core.data.datasources.suggestions
 
 import com.globant.ticketmaster.core.common.IoDispatcher
 import com.globant.ticketmaster.core.data.ApiServices
@@ -20,7 +20,7 @@ class SuggestionsRemoteDataSourceImpl
                 try {
                     val result = apiServices.getSuggestions(countryCode)
                     Result.success(
-                        result.embedded?.events?.networkToDomains(countryCode = countryCode)
+                        result.embedded?.events?.networkToDomains(countryCode = countryCode, page = 0)
                             ?: emptyList(),
                     )
                 } catch (e: Exception) {

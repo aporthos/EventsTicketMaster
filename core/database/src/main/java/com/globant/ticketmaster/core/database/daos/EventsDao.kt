@@ -1,5 +1,6 @@
 package com.globant.ticketmaster.core.database.daos
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -19,8 +20,7 @@ interface EventsDao {
     @Query(
         value = """
             SELECT * FROM events
-            WHERE 
-            countryCode = :countryCode 
+            WHERE countryCode = :countryCode 
             AND idClassification LIKE :idClassification
             AND name LIKE :keyword
             LIMIT 20
@@ -31,6 +31,22 @@ interface EventsDao {
         keyword: String,
         idClassification: String,
     ): Flow<List<EventsWithVenuesEntity>>
+
+    @Transaction
+    @Query(
+        value = """
+        SELECT * FROM events
+            WHERE countryCode = :countryCode 
+            AND idClassification LIKE :idClassification
+            AND name LIKE :keyword 
+            ORDER BY createdAt ASC
+    """,
+    )
+    fun pagingAllEvents(
+        countryCode: String,
+        keyword: String,
+        idClassification: String,
+    ): PagingSource<Int, EventEntity>
 
     @Transaction
     @Query(
@@ -69,4 +85,8 @@ interface EventsDao {
         idEvent: String,
         eventType: EventType,
     ): Int
+
+    @Transaction
+    @Query("DELETE FROM events")
+    suspend fun deleteAllEvents()
 }

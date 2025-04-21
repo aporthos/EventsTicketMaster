@@ -1,9 +1,9 @@
 package com.globant.ticketmaster.core.data.repositories
 
 import com.globant.ticketmaster.core.common.IoDispatcher
-import com.globant.ticketmaster.core.data.datasources.EventsLocalDataSource
-import com.globant.ticketmaster.core.data.datasources.SuggestionsLocalDataSource
-import com.globant.ticketmaster.core.data.datasources.SuggestionsRemoteDataSource
+import com.globant.ticketmaster.core.data.datasources.events.EventsLocalDataSource
+import com.globant.ticketmaster.core.data.datasources.suggestions.SuggestionsLocalDataSource
+import com.globant.ticketmaster.core.data.datasources.suggestions.SuggestionsRemoteDataSource
 import com.globant.ticketmaster.core.domain.repositories.SuggestionsRepository
 import com.globant.ticketmaster.core.models.domain.Event
 import kotlinx.coroutines.CoroutineDispatcher

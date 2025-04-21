@@ -1,4 +1,4 @@
-package com.globant.ticketmaster.core.data.datasources
+package com.globant.ticketmaster.core.data.datasources.events
 
 import com.globant.ticketmaster.core.common.EventType
 import com.globant.ticketmaster.core.common.IoDispatcher

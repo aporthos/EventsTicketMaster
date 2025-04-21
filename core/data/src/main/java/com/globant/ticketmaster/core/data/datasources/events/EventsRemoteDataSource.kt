@@ -1,4 +1,4 @@
-package com.globant.ticketmaster.core.data.datasources
+package com.globant.ticketmaster.core.data.datasources.events
 
 import com.globant.ticketmaster.core.common.IoDispatcher
 import com.globant.ticketmaster.core.data.ApiServices
@@ -18,6 +18,7 @@ class EventsRemoteDataSourceImpl
         override suspend fun getEvents(
             countryCode: String,
             keyword: String,
+            page: Int,
             idClassification: String,
         ): Result<List<Event>> =
             withContext(ioDispatcher) {
@@ -26,10 +27,14 @@ class EventsRemoteDataSourceImpl
                         apiServices.getEvents(
                             countryCode = countryCode,
                             keyword = keyword,
+                            page = page,
                             idClassification = idClassification,
                         )
                     Result.success(
-                        result.embedded?.events?.networkToDomains(countryCode = countryCode)
+                        result.embedded?.events?.networkToDomains(
+                            countryCode = countryCode,
+                            page = page,
+                        )
                             ?: emptyList(),
                     )
                 } catch (e: Exception) {
@@ -43,6 +48,7 @@ interface EventsRemoteDataSource {
     suspend fun getEvents(
         countryCode: String,
         keyword: String,
+        page: Int,
         idClassification: String,
     ): Result<List<Event>>
 }

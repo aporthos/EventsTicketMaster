@@ -66,6 +66,9 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.kotlinx.serialization.json)
 
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
+
     implementation(project(":core:domain"))
     implementation(project(":core:common"))
     implementation(project(":core:models:domain"))

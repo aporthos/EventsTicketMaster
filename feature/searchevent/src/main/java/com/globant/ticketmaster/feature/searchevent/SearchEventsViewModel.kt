@@ -4,19 +4,20 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import androidx.paging.cachedIn
+import androidx.paging.map
 import com.globant.ticketmaster.core.common.EventType
-import com.globant.ticketmaster.core.domain.usecases.GetEventsUseCase
+import com.globant.ticketmaster.core.domain.usecases.GetEventsPagingUseCase
 import com.globant.ticketmaster.core.domain.usecases.UpdateFavoriteEventUseCase
+import com.globant.ticketmaster.core.models.domain.Event
 import com.globant.ticketmaster.core.models.ui.EventUi
-import com.globant.ticketmaster.core.models.ui.domainToUis
+import com.globant.ticketmaster.core.models.ui.domainToUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -26,39 +27,38 @@ class SearchEventsViewModel
     @Inject
     constructor(
         savedStateHandle: SavedStateHandle,
-        getEventsUseCase: GetEventsUseCase,
+        private val getEventsPagingUseCase: GetEventsPagingUseCase,
         private val updateFavoriteEventUseCase: UpdateFavoriteEventUseCase,
     ) : ViewModel() {
         private val idClassification = savedStateHandle.toRoute<SearchEvents>().idClassification
-        private val keyword = MutableStateFlow("")
+        private val searchFilters =
+            MutableStateFlow(
+                SearchFilters(
+                    keyword = "",
+                    countryCode = "MX",
+                    idClassification = idClassification,
+                ),
+            )
 
-        val eventsState: StateFlow<EventsUiState> =
-            keyword
+        val eventsPagingState =
+            searchFilters
                 .debounce(500)
-                .flatMapLatest { keyword ->
-                    getEventsUseCase(
-                        GetEventsUseCase.Params(
-                            countryCode = "MX",
-                            keyword = keyword,
-                            idClassification = idClassification,
-                        ),
-                    )
-                }.map { result ->
-                    if (result.isEmpty()) {
-                        EventsUiState.Empty
-                    } else {
-                        EventsUiState.Success(
-                            events = result.domainToUis(),
+                .flatMapLatest { filters ->
+                    val params =
+                        GetEventsPagingUseCase.Params(
+                            countryCode = filters.countryCode,
+                            keyword = filters.keyword,
+                            idClassification = filters.idClassification,
                         )
-                    }
-                }.stateIn(
-                    scope = viewModelScope,
-                    initialValue = EventsUiState.Loading,
-                    started = SharingStarted.WhileSubscribed(),
-                )
+                    getEventsPagingUseCase(params)
+                }.map { paging ->
+                    paging.map(Event::domainToUi)
+                }.cachedIn(viewModelScope)
 
         fun onSearch(search: String) {
-            this.keyword.value = search
+            this.searchFilters.update {
+                it.copy(keyword = search)
+            }
         }
 
         fun updateFavoriteEvent(event: EventUi) {

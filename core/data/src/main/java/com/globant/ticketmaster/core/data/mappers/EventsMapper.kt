@@ -19,6 +19,23 @@ fun EventsWithVenuesEntity.entityToDomain(): Event =
         eventType = event.eventType,
         countryCode = event.countryCode,
         idClassification = event.idClassification,
+        page = event.page,
+    )
+
+fun EventEntity.entityToDomain(): Event =
+    Event(
+        idEvent = idEvent,
+        name = name,
+        type = type,
+        urlEvent = urlEvent,
+        locale = locale,
+        urlImage = urlImage,
+        startDateTime = startDateTime,
+        venues = listOf(),
+        eventType = eventType,
+        countryCode = countryCode,
+        idClassification = idClassification,
+        page = page,
     )
 
 fun Event.domainToEntity(): EventEntity =
@@ -33,11 +50,13 @@ fun Event.domainToEntity(): EventEntity =
         eventType = eventType,
         countryCode = countryCode,
         idClassification = idClassification,
+        page = page,
     )
 
 fun EventNetwork.networkToDomain(
     eventType: EventType,
     countryCode: String,
+    page: Int,
 ): Event =
     Event(
         idEvent = idEvent.orEmpty(),
@@ -50,6 +69,7 @@ fun EventNetwork.networkToDomain(
         venues = embedded.venues.networkToDomains(),
         eventType = eventType,
         countryCode = countryCode,
+        page = page,
         idClassification =
             classifications
                 ?.firstOrNull()
@@ -61,9 +81,10 @@ fun EventNetwork.networkToDomain(
 fun List<EventNetwork>.networkToDomains(
     eventType: EventType = EventType.Default,
     countryCode: String,
+    page: Int,
 ): List<Event> =
     map { event ->
-        event.networkToDomain(eventType, countryCode)
+        event.networkToDomain(eventType = eventType, countryCode = countryCode, page = page)
     }
 
 fun List<EventsWithVenuesEntity>.entityToDomains(): List<Event> = map(EventsWithVenuesEntity::entityToDomain)
