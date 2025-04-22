@@ -2,11 +2,14 @@ package com.globant.ticketmaster.core.data.mappers
 
 import com.globant.ticketmaster.core.common.EventType
 import com.globant.ticketmaster.core.models.domain.Event
+import com.globant.ticketmaster.core.models.domain.Sales
 import com.globant.ticketmaster.core.models.entity.EventEntity
 import com.globant.ticketmaster.core.models.entity.EventsWithVenuesEntity
 import com.globant.ticketmaster.core.models.entity.FavoritesWithEventsEntity
 import com.globant.ticketmaster.core.models.entity.LastVisitedWithEventsEntity
 import com.globant.ticketmaster.core.models.network.events.EventNetwork
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 fun EventsWithVenuesEntity.entityToDomain(): Event =
     Event(
@@ -16,11 +19,13 @@ fun EventsWithVenuesEntity.entityToDomain(): Event =
         urlEvent = event.urlEvent,
         locale = event.locale,
         urlImage = event.urlImage,
-        startDateTime = event.startDateTime,
+        startEventDateTime = event.startEvent,
         venues = venues.entityToDomains(),
         eventType = favorite?.eventType ?: EventType.Default,
         countryCode = event.countryCode,
         idClassification = event.idClassification,
+        sales = event.sales.entityToDomain(),
+        info = event.info,
         page = event.page,
     )
 
@@ -32,11 +37,13 @@ fun LastVisitedWithEventsEntity.entityToDomain(): Event =
         urlEvent = event.urlEvent,
         locale = event.locale,
         urlImage = event.urlImage,
-        startDateTime = event.startDateTime,
+        startEventDateTime = event.startEvent,
         venues = venues.entityToDomains(),
         eventType = favorite?.eventType ?: EventType.Default,
         countryCode = event.countryCode,
         idClassification = event.idClassification,
+        sales = event.sales.entityToDomain(),
+        info = event.info,
         page = event.page,
     )
 
@@ -48,11 +55,13 @@ fun FavoritesWithEventsEntity.entityToDomain(): Event =
         urlEvent = event.urlEvent,
         locale = event.locale,
         urlImage = event.urlImage,
-        startDateTime = event.startDateTime,
+        startEventDateTime = event.startEvent,
         venues = venues.entityToDomains(),
         eventType = favorites.eventType,
         countryCode = event.countryCode,
         idClassification = event.idClassification,
+        sales = event.sales.entityToDomain(),
+        info = event.info,
         page = event.page,
     )
 
@@ -64,9 +73,11 @@ fun Event.domainToEntity(): EventEntity =
         urlEvent = urlEvent,
         locale = locale,
         urlImage = urlImage,
-        startDateTime = startDateTime,
+        startEvent = startEventDateTime,
         countryCode = countryCode,
         idClassification = idClassification,
+        info = info,
+        sales = sales.domainToEntity(),
         page = page,
     )
 
@@ -82,11 +93,13 @@ fun EventNetwork.networkToDomain(
         urlEvent = urlEvent.orEmpty(),
         locale = locale.orEmpty(),
         urlImage = urlImages?.firstOrNull()?.url ?: "",
-        startDateTime = dates?.start?.dateTime.orEmpty(),
+        startEventDateTime = dates?.start?.localDate?.toLongDate() ?: 0,
         venues = embedded.venues.networkToDomains(),
         eventType = eventType,
         countryCode = countryCode,
         page = page,
+        info = info.orEmpty(),
+        sales = sales?.networkToDomain() ?: Sales(0, 0),
         idClassification =
             classifications
                 ?.firstOrNull()
@@ -94,6 +107,14 @@ fun EventNetwork.networkToDomain(
                 ?.id
                 .orEmpty(),
     )
+
+fun String.toLongDate(): Long =
+    try {
+        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        formatter.parse(this)?.time ?: 0
+    } catch (e: Exception) {
+        0
+    }
 
 fun List<EventNetwork>.networkToDomains(
     eventType: EventType = EventType.Default,

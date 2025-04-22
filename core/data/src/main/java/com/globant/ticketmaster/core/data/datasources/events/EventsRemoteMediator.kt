@@ -46,8 +46,7 @@ class EventsRemoteMediator(
                                 ?: return MediatorResult.Success(
                                     endOfPaginationReached = false,
                                 )
-                        // lastItem.page + 1
-                        0
+                        lastItem.event.page + 1
                     }
                 }
             val response =
@@ -59,8 +58,9 @@ class EventsRemoteMediator(
                 )
             // TODO: Remove, this only for tests
             delay(3_000L)
-            val events = response.embedded?.events ?: emptyList()
-            executeTransactions(loadType, page, events)
+            response.embedded?.events?.let { events ->
+                executeTransactions(loadType, page, events)
+            }
             MediatorResult.Success(
                 endOfPaginationReached = response.page?.totalPages == page,
             )
@@ -85,7 +85,7 @@ class EventsRemoteMediator(
                     events
                         .flatMap { it.venues.domainToEntities(it.idEvent) }
                         .map { it.idEventVenues }
-                eventsDao.deleteEvents(events.map { it.idEvent })
+                eventsDao.deleteEventsById(events.map { it.idEvent })
                 venuesDao.deleteVenuesByIdEvent(venues)
             },
             insertOperation = {

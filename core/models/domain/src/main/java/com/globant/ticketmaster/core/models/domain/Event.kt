@@ -9,10 +9,12 @@ data class Event(
     val urlEvent: String,
     val locale: String,
     val urlImage: String,
-    val startDateTime: String,
+    val startEventDateTime: Long,
     val venues: List<Venues>,
     val eventType: EventType,
     val countryCode: String,
     val idClassification: String,
+    val sales: Sales,
+    val info: String,
     val page: Int,
 )

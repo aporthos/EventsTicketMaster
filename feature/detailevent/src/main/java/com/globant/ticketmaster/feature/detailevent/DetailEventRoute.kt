@@ -117,9 +117,13 @@ fun DetailEvent(
                 style = MaterialTheme.typography.titleLarge,
                 text = event.venues.first().name,
             )
-            Text(text = "${event.venues.first().city}, ${event.venues.first().state}")
+            Text(text = "${event.venues.first().city}, ${event.venues.first().stateCode}")
         }
         Text(text = event.startDateTime)
+        Text(text = event.info)
+
+        Text("Ventas disponibles:")
+        Text(text = event.salesDateTime)
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -164,7 +168,11 @@ private fun DetailEventPreview() {
                 urlEvent = "https://www.google.com/#q=praesent",
                 locale = "venenatis",
                 urlImage = "https://duckduckgo.com/?q=persequeris",
-                startDateTime = "sept 12",
+                month = "Sept",
+                day = "18",
+                startDateTime = "2025-04-23T01:30:00Z",
+                info = "semper",
+                salesDateTime = "2025-04-23T01:30:00Z",
                 venues =
                     listOf(
                         Venues(
@@ -175,6 +183,7 @@ private fun DetailEventPreview() {
                             state = "Ciudad de México",
                             country = "Mexico",
                             address = "Viaducto Piedad y Río Churubusco s/n Cd. Deportiva",
+                            stateCode = "CDMX",
                             location =
                                 Location(
                                     latitude = 0.0,

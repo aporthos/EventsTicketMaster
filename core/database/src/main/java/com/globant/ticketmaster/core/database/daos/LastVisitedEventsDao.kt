@@ -41,15 +41,4 @@ interface LastVisitedEventsDao {
         keyword: String,
         countryCode: String,
     ): PagingSource<Int, LastVisitedWithEventsEntity>
-
-    @Query(
-        value = """
-            UPDATE lastVisitedEvents SET cratedAt = :lastVisited 
-            WHERE idLastVisitedEvent = :idEvent
-    """,
-    )
-    fun updateLastVisitedEvent(
-        idEvent: String,
-        lastVisited: Long,
-    ): Int
 }

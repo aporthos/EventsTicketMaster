@@ -14,6 +14,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -36,11 +37,16 @@ fun EventItem(
     onFavoriteClick: (EventUi) -> Unit,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth().clickable { onEventClick(event) },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onEventClick(event) },
         shape = RoundedCornerShape(0.dp),
     ) {
         Row(modifier = Modifier.padding(8.dp)) {
-            Column {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 AsyncImage(
                     modifier =
                         Modifier
@@ -56,8 +62,8 @@ fun EventItem(
                     error = painterResource(Designsystem.drawable.placeholder),
                     contentDescription = null,
                 )
-                Text("Sept")
-                Text("18")
+                Text(event.month)
+                Text(event.day)
             }
 
             Column(modifier = Modifier.padding(start = 8.dp)) {
@@ -108,9 +114,13 @@ fun EventItemPreview() {
             urlEvent = "https://www.ticketmaster.com/new-york-yankees-vs-toronto-blue-bronx-new-york-04-26-2025/event/1D00611CAAF94D41",
             locale = "en-us",
             urlImage = "https://s1.ticketm.net/dam/a/7e0/479ac7e7-15fb-44ba-8708-fc1bf2d037e0_RETINA_PORTRAIT_3_2.jpg",
-            startDateTime = "2025-04-27T17:35:00Z",
+            month = "Sept",
+            day = "18",
+            startDateTime = "2025-04-23T01:30:00Z",
             imageFavorite = Designsystem.drawable.favorite_unselected,
             eventType = EventType.Default,
+            info = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            salesDateTime = "2025-04-23T01:30:00Z",
             venues =
                 listOf(
                     Venues(
@@ -121,6 +131,7 @@ fun EventItemPreview() {
                         state = "Ciudad de México",
                         country = "Mexico",
                         address = "Viaducto Piedad y Río Churubusco s/n Cd. Deportiva",
+                        stateCode = "CDMX",
                         location =
                             Location(
                                 latitude = 0.0,

@@ -14,6 +14,7 @@ data class VenuesEntity(
     val urlVenue: String,
     val city: String,
     val state: String,
+    val stateCode: String,
     val country: String,
     val address: String,
     @Embedded val location: LocationEntity,

@@ -6,8 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import androidx.room.Upsert
-import com.globant.ticketmaster.core.common.EventType
 import com.globant.ticketmaster.core.models.entity.EventEntity
 import com.globant.ticketmaster.core.models.entity.EventsWithVenuesEntity
 import kotlinx.coroutines.flow.Flow
@@ -17,9 +15,6 @@ interface EventsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrIgnore(entities: List<EventEntity>)
 
-    @Upsert
-    suspend fun upsertAll(beers: List<EventEntity>)
-
     @Transaction
     @Query(
         value = """
@@ -27,7 +22,7 @@ interface EventsDao {
         WHERE countryCode = :countryCode 
         AND idClassification LIKE '%' || :idClassification || '%'
         AND name LIKE '%' || :keyword || '%'
-        ORDER BY createdAt ASC
+        ORDER BY startEvent ASC
     """,
     )
     fun pagingAllEvents(
@@ -50,30 +45,16 @@ interface EventsDao {
         value = """
             SELECT * FROM events
             WHERE idEvent IN (:ids)
+            ORDER BY startEvent ASC
     """,
     )
     fun getSuggestedEvents(ids: List<String>): Flow<List<EventsWithVenuesEntity>>
 
     @Query(
         value = """
-            UPDATE favoritesEvents SET eventType = :eventType
-            WHERE idFavoriteEvent = :idEvent
+            DELETE FROM events
+            WHERE idEvent IN (:ids)
     """,
     )
-    suspend fun updateFavoriteByIdEvent(
-        idEvent: String,
-        eventType: EventType,
-    ): Int
-
-    @Transaction
-    @Query(
-        value = """
-        UPDATE favoritesEvents SET eventType = :eventType
-        WHERE idFavoriteEvent IN (:ids)
-    """,
-    )
-    suspend fun deleteEvents(
-        ids: List<String>,
-        eventType: EventType = EventType.Deleted,
-    )
+    suspend fun deleteEventsById(ids: List<String>)
 }

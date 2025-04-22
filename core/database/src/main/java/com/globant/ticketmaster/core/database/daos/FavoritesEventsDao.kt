@@ -23,7 +23,7 @@ interface FavoritesEventsDao {
             WHERE events.countryCode = :countryCode
             AND events.name LIKE '%' || :keyword || '%'
             and favoritesEvents.eventType = :eventType
-            ORDER BY events.createdAt DESC
+            ORDER BY events.startEvent ASC
     """,
     )
     fun getFavoritesEventsPaging(

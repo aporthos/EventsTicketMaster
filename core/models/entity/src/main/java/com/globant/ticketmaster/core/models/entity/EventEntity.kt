@@ -1,8 +1,8 @@
 package com.globant.ticketmaster.core.models.entity
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.Date
 
 @Entity(
     tableName = "events",
@@ -14,9 +14,10 @@ data class EventEntity(
     val urlEvent: String,
     val locale: String,
     val urlImage: String,
-    val startDateTime: String,
+    val startEvent: Long,
     val countryCode: String,
     val idClassification: String,
-    val createdAt: Long = Date().time,
+    val info: String,
     val page: Int,
+    @Embedded val sales: SalesEntity,
 )
