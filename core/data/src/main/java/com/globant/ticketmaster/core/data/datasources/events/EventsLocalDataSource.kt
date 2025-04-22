@@ -69,10 +69,20 @@ class EventsLocalDataSourceImpl
 
         override suspend fun addEvents(events: List<Event>) {
             withContext(dispatcher) {
+                val venues = events.flatMap { it.venues.domainToEntities(it.idEvent) }
                 eventsDao.insertOrIgnore(events.domainToEntities())
-                events.map { event ->
-                    venuesDao.insertOrIgnore(event.venues.domainToEntities(event.idEvent))
-                }
+                venuesDao.insertOrIgnore(venues)
+            }
+        }
+
+        override suspend fun deleteEvents(events: List<Event>) {
+            withContext(dispatcher) {
+                val venues =
+                    events
+                        .flatMap { it.venues.domainToEntities(it.idEvent) }
+                        .map { it.idEventVenues }
+                eventsDao.deleteEventsById(events.map { it.idEvent })
+                venuesDao.deleteVenuesByIdEvent(venues)
             }
         }
 
@@ -117,6 +127,8 @@ interface EventsLocalDataSource {
     fun getSuggestedEvents(ids: List<String>): Flow<List<Event>>
 
     suspend fun addEvents(events: List<Event>)
+
+    suspend fun deleteEvents(events: List<Event>)
 
     suspend fun setFavoriteEvent(
         idEvent: String,

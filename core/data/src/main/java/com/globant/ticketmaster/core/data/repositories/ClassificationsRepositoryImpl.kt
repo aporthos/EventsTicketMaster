@@ -23,7 +23,7 @@ class ClassificationsRepositoryImpl
     ) : ClassificationsRepository {
         override fun getClassifications(): Flow<List<Classification>> =
             flow {
-                val cache = local.getClassifications()
+                val cache = local.getClassificationsStream()
 
                 if (cache.first().isEmpty()) {
                     val result = remote.getClassifications()

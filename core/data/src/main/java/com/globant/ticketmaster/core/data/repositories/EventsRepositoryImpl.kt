@@ -12,7 +12,6 @@ import com.globant.ticketmaster.core.data.datasources.events.EventsRemoteMediato
 import com.globant.ticketmaster.core.data.mappers.entityToDomain
 import com.globant.ticketmaster.core.database.EventsTransactions
 import com.globant.ticketmaster.core.database.daos.EventsDao
-import com.globant.ticketmaster.core.database.daos.VenuesDao
 import com.globant.ticketmaster.core.domain.repositories.EventsRepository
 import com.globant.ticketmaster.core.models.domain.Event
 import com.globant.ticketmaster.core.models.entity.EventsWithVenuesEntity
@@ -28,7 +27,6 @@ class EventsRepositoryImpl
     @Inject
     constructor(
         private val eventsDao: EventsDao,
-        private val venuesDao: VenuesDao,
         private val eventsTransactions: EventsTransactions,
         private val local: EventsLocalDataSource,
         private val apiServices: ApiServices,
@@ -79,8 +77,7 @@ class EventsRepositoryImpl
                         idClassification = idClassification,
                         apiServices = apiServices,
                         eventsTransactions = eventsTransactions,
-                        eventsDao = eventsDao,
-                        venuesDao = venuesDao,
+                        eventsLocalDataSource = local,
                     ),
                 pagingSourceFactory = {
                     eventsDao.pagingAllEvents(
@@ -111,11 +108,4 @@ class EventsRepositoryImpl
                 lastVisited = lastVisited,
                 countryCode = countryCode,
             )
-
-        private fun search(keyword: String): String =
-            if (keyword.isEmpty()) {
-                "%%"
-            } else {
-                "%$keyword%"
-            }
     }

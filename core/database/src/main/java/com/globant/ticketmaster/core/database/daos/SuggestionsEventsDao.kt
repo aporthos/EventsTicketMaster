@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.globant.ticketmaster.core.models.entity.SuggestionEventEntity
+import com.globant.ticketmaster.core.models.entity.SuggestionsWithEventsEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -16,8 +17,14 @@ interface SuggestionsEventsDao {
     @Transaction
     @Query(
         value = """
-            SELECT idEvent FROM suggestionsEvents
+            SELECT * FROM suggestionsEvents
+            INNER JOIN events ON suggestionsEvents.idEvent = events.idEvent
+            WHERE events.countryCode = :countryCode
+            ORDER BY events.startEvent ASC
     """,
     )
-    fun getIdsSuggestionsEvents(): Flow<List<String>>
+    fun getSuggestionsEvents(countryCode: String): Flow<List<SuggestionsWithEventsEntity>>
+
+    @Query("DELETE FROM suggestionsEvents")
+    suspend fun deleteSuggestions()
 }

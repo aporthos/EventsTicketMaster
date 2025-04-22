@@ -75,6 +75,7 @@ fun EventItem(
                     )
                     Text(text = "${event.venues.first().city}, ${event.venues.first().state}")
                 }
+                Text(text = event.segment)
                 Row {
                     IconButton(onClick = { }) {
                         Icon(
@@ -121,6 +122,7 @@ fun EventItemPreview() {
             eventType = EventType.Default,
             info = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             salesDateTime = "2025-04-23T01:30:00Z",
+            segment = "Sports",
             venues =
                 listOf(
                     Venues(

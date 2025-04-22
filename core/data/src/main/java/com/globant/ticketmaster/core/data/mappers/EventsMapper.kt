@@ -26,6 +26,7 @@ fun EventsWithVenuesEntity.entityToDomain(): Event =
         idClassification = event.idClassification,
         sales = event.sales.entityToDomain(),
         info = event.info,
+        segment = event.segment,
         page = event.page,
     )
 
@@ -44,6 +45,7 @@ fun LastVisitedWithEventsEntity.entityToDomain(): Event =
         idClassification = event.idClassification,
         sales = event.sales.entityToDomain(),
         info = event.info,
+        segment = event.segment,
         page = event.page,
     )
 
@@ -62,6 +64,7 @@ fun FavoritesWithEventsEntity.entityToDomain(): Event =
         idClassification = event.idClassification,
         sales = event.sales.entityToDomain(),
         info = event.info,
+        segment = event.segment,
         page = event.page,
     )
 
@@ -78,6 +81,7 @@ fun Event.domainToEntity(): EventEntity =
         idClassification = idClassification,
         info = info,
         sales = sales.domainToEntity(),
+        segment = segment,
         page = page,
     )
 
@@ -92,13 +96,19 @@ fun EventNetwork.networkToDomain(
         type = type.orEmpty(),
         urlEvent = urlEvent.orEmpty(),
         locale = locale.orEmpty(),
-        urlImage = urlImages?.firstOrNull()?.url ?: "",
+        urlImage = urlImages?.firstOrNull { it.width == 1024 }?.url.orEmpty(),
         startEventDateTime = dates?.start?.localDate?.toLongDate() ?: 0,
         venues = embedded.venues.networkToDomains(),
         eventType = eventType,
         countryCode = countryCode,
         page = page,
         info = info.orEmpty(),
+        segment =
+            classifications
+                ?.firstOrNull()
+                ?.segment
+                ?.name
+                .orEmpty(),
         sales = sales?.networkToDomain() ?: Sales(0, 0),
         idClassification =
             classifications

@@ -15,6 +15,7 @@ data class Event(
     val countryCode: String,
     val idClassification: String,
     val sales: Sales,
+    val segment: String,
     val info: String,
     val page: Int,
 )

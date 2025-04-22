@@ -27,7 +27,7 @@ class GetSuggestionsUseCase
                 eventsRepository.getLastVisitedEvents(params.countryCode),
             ) { suggestions, events ->
                 HomeResult(
-                    suggestionsEvents = suggestions,
+                    suggestionsEvents = suggestions.getOrElse { emptyList() },
                     lastVisitedEvents = events,
                 )
             }

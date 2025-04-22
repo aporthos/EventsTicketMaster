@@ -4,11 +4,8 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.globant.ticketmaster.core.data.ApiServices
-import com.globant.ticketmaster.core.data.mappers.domainToEntities
 import com.globant.ticketmaster.core.data.mappers.networkToDomains
 import com.globant.ticketmaster.core.database.EventsTransactions
-import com.globant.ticketmaster.core.database.daos.EventsDao
-import com.globant.ticketmaster.core.database.daos.VenuesDao
 import com.globant.ticketmaster.core.models.entity.EventsWithVenuesEntity
 import com.globant.ticketmaster.core.models.network.events.EventNetwork
 import kotlinx.coroutines.delay
@@ -21,8 +18,7 @@ class EventsRemoteMediator(
     private val idClassification: String,
     private val apiServices: ApiServices,
     private val eventsTransactions: EventsTransactions,
-    private val eventsDao: EventsDao,
-    private val venuesDao: VenuesDao,
+    private val eventsLocalDataSource: EventsLocalDataSource,
 ) : RemoteMediator<Int, EventsWithVenuesEntity>() {
     companion object {
         private const val STARTING_PAGE_INDEX = 0
@@ -81,17 +77,10 @@ class EventsRemoteMediator(
             loadType,
             needDelete = { loadType == LoadType.REFRESH },
             deleteOperation = {
-                val venues =
-                    events
-                        .flatMap { it.venues.domainToEntities(it.idEvent) }
-                        .map { it.idEventVenues }
-                eventsDao.deleteEventsById(events.map { it.idEvent })
-                venuesDao.deleteVenuesByIdEvent(venues)
+                eventsLocalDataSource.deleteEvents(events)
             },
             insertOperation = {
-                val venues = events.flatMap { it.venues.domainToEntities(it.idEvent) }
-                eventsDao.insertOrIgnore(events.domainToEntities())
-                venuesDao.insertOrIgnore(venues)
+                eventsLocalDataSource.addEvents(events)
             },
         )
     }

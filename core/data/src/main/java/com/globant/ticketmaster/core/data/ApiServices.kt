@@ -21,5 +21,6 @@ interface ApiServices {
     @GET("discovery/v2/suggest?resource=events")
     suspend fun getSuggestions(
         @Query("countryCode") countryCode: String,
+        @Query("segmentId") segmentId: String,
     ): BaseResponseNetwork<EventNetwork>
 }

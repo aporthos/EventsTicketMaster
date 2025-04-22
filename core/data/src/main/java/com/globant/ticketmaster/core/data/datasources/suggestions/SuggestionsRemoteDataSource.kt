@@ -15,10 +15,17 @@ class SuggestionsRemoteDataSourceImpl
         private val apiServices: ApiServices,
         @IoDispatcher private val dispatcher: CoroutineDispatcher,
     ) : SuggestionsRemoteDataSource {
-        override suspend fun getSuggestionsEvents(countryCode: String): Result<List<Event>> =
+        override suspend fun getSuggestionsEvents(
+            countryCode: String,
+            idSegments: String,
+        ): Result<List<Event>> =
             withContext(dispatcher) {
                 try {
-                    val result = apiServices.getSuggestions(countryCode)
+                    val result =
+                        apiServices.getSuggestions(
+                            countryCode = countryCode,
+                            segmentId = idSegments,
+                        )
                     Result.success(
                         result.embedded?.events?.networkToDomains(countryCode = countryCode, page = 0)
                             ?: emptyList(),
@@ -31,5 +38,8 @@ class SuggestionsRemoteDataSourceImpl
     }
 
 interface SuggestionsRemoteDataSource {
-    suspend fun getSuggestionsEvents(countryCode: String): Result<List<Event>>
+    suspend fun getSuggestionsEvents(
+        countryCode: String,
+        idSegments: String,
+    ): Result<List<Event>>
 }

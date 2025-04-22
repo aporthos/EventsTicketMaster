@@ -121,6 +121,7 @@ fun DetailEvent(
         }
         Text(text = event.startDateTime)
         Text(text = event.info)
+        Text(text = event.segment)
 
         Text("Ventas disponibles:")
         Text(text = event.salesDateTime)
@@ -173,6 +174,7 @@ private fun DetailEventPreview() {
                 startDateTime = "2025-04-23T01:30:00Z",
                 info = "semper",
                 salesDateTime = "2025-04-23T01:30:00Z",
+                segment = "Sports",
                 venues =
                     listOf(
                         Venues(

@@ -19,7 +19,7 @@ class ClassificationsLocalDataSourceImpl
         private val dao: ClassificationsDao,
         @IoDispatcher private val dispatcher: CoroutineDispatcher,
     ) : ClassificationsLocalDataSource {
-        override fun getClassifications(): Flow<List<Classification>> =
+        override fun getClassificationsStream(): Flow<List<Classification>> =
             dao
                 .getAllClassifications()
                 .map(List<ClassificationsEntity>::entityToDomains)
@@ -33,7 +33,7 @@ class ClassificationsLocalDataSourceImpl
     }
 
 interface ClassificationsLocalDataSource {
-    fun getClassifications(): Flow<List<Classification>>
+    fun getClassificationsStream(): Flow<List<Classification>>
 
     suspend fun addClassifications(classifications: List<Classification>)
 }
