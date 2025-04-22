@@ -1,12 +1,16 @@
 package com.globant.ticketmaster.feature.events
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -30,7 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.globant.ticketmaster.core.models.domain.Classification
 import com.globant.ticketmaster.core.models.ui.EventUi
-import com.globant.ticketmaster.core.ui.EventItem
+import com.globant.ticketmaster.core.ui.EventLargeItem
 import com.globant.ticketmaster.core.ui.LoadingScreen
 import com.globant.ticketmaster.core.designsystem.R as DesignSystem
 
@@ -86,6 +90,7 @@ fun EventsRoute(
                 modifier = Modifier.padding(paddingValues),
             ) {
                 SectionClassifications(classificationsState, onClassificationClick)
+                Spacer(modifier = Modifier.width(8.dp))
                 SectionEvents(
                     eventsState = eventsState,
                     onEventClick = onEventClick,
@@ -97,6 +102,7 @@ fun EventsRoute(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SectionEvents(
     eventsState: EventsUiState,
@@ -112,10 +118,14 @@ fun SectionEvents(
 
         is EventsUiState.Items -> {
             LazyColumn {
-                item {
-                    if (eventsState.lastVisitedEvents.isNotEmpty()) {
+                if (eventsState.lastVisitedEvents.isNotEmpty()) {
+                    stickyHeader {
                         Row(
-                            modifier = Modifier.padding(horizontal = 8.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.background)
+                                    .padding(horizontal = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
@@ -132,20 +142,26 @@ fun SectionEvents(
                         }
                     }
                 }
-
-                items(eventsState.lastVisitedEvents) { item ->
-                    EventItem(item, onEventClick, onFavoriteClick)
-                }
-
                 item {
+                    LazyRow {
+                        items(eventsState.lastVisitedEvents) { item ->
+                            EventLargeItem(item, onEventClick, onFavoriteClick)
+                        }
+                    }
+                }
+                stickyHeader {
                     Text(
-                        modifier = Modifier.padding(horizontal = 8.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.background)
+                                .padding(horizontal = 8.dp),
                         text = stringResource(R.string.section_suggestions),
                         style = MaterialTheme.typography.titleLarge,
                     )
                 }
                 items(eventsState.suggestionsEvents) { item ->
-                    EventItem(item, onEventClick, onFavoriteClick)
+                    EventLargeItem(item, onEventClick, onFavoriteClick)
                 }
             }
         }

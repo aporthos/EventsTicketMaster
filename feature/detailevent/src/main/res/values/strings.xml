@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="share_event">Checa este evento: %s</string>
+    <string name="buy_tickets">Ir a comprar boletos</string>
+    <string name="start_date">Fecha de inicio</string>
+    <string name="category">Categoria</string>
+    <string name="date_sales">Fecha de venta</string>
+    <string name="about">Acerca de</string>
+</resources>

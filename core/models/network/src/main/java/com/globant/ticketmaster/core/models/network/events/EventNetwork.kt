@@ -22,6 +22,8 @@ data class EventNetwork(
     val urlImages: List<ImageNetwork>?,
     @Json(name = "dates")
     val dates: DatesNetwork?,
+    @Json(name = "seatmap")
+    val seatMap: SeatMapNetwork?,
     @Json(name = "_embedded")
     val embedded: EmbeddedNetwork<VenuesNetwork>,
     @Json(name = "classifications")

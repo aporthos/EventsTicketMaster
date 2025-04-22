@@ -27,6 +27,7 @@ fun EventsWithVenuesEntity.entityToDomain(): Event =
         sales = event.sales.entityToDomain(),
         info = event.info,
         segment = event.segment,
+        seatMap = event.seatMap,
         page = event.page,
     )
 
@@ -45,6 +46,7 @@ fun LastVisitedWithEventsEntity.entityToDomain(): Event =
         idClassification = event.idClassification,
         sales = event.sales.entityToDomain(),
         info = event.info,
+        seatMap = event.seatMap,
         segment = event.segment,
         page = event.page,
     )
@@ -65,6 +67,7 @@ fun FavoritesWithEventsEntity.entityToDomain(): Event =
         sales = event.sales.entityToDomain(),
         info = event.info,
         segment = event.segment,
+        seatMap = event.seatMap,
         page = event.page,
     )
 
@@ -82,6 +85,7 @@ fun Event.domainToEntity(): EventEntity =
         info = info,
         sales = sales.domainToEntity(),
         segment = segment,
+        seatMap = seatMap,
         page = page,
     )
 
@@ -103,6 +107,7 @@ fun EventNetwork.networkToDomain(
         countryCode = countryCode,
         page = page,
         info = info.orEmpty(),
+        seatMap = seatMap?.staticUrl.orEmpty(),
         segment =
             classifications
                 ?.firstOrNull()

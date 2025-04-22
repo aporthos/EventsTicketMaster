@@ -4,8 +4,8 @@ import androidx.annotation.DrawableRes
 import com.globant.ticketmaster.core.common.EventType
 import com.globant.ticketmaster.core.designsystem.R
 import com.globant.ticketmaster.core.models.domain.Event
+import com.globant.ticketmaster.core.models.domain.Location
 import com.globant.ticketmaster.core.models.domain.Sales
-import com.globant.ticketmaster.core.models.domain.Venues
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -17,16 +17,21 @@ data class EventUi(
     val urlEvent: String,
     val locale: String,
     val urlImage: String,
-    val month: String,
-    val day: String,
+    val date: String,
+    val locationPlace: String,
+    val locationAddress: String,
+    val locationCoordinates: Location,
     val startDateTime: String,
     val salesDateTime: String,
     val info: String,
     val segment: String,
-    val venues: List<Venues>,
+    val seatMap: String,
     val eventType: EventType,
     @DrawableRes val imageFavorite: Int,
-)
+) {
+    val locationNavigation: String =
+        "google.navigation:q=$${locationCoordinates.latitude},${locationCoordinates.longitude}&mode=d"
+}
 
 fun Event.domainToUi() =
     EventUi(
@@ -36,14 +41,16 @@ fun Event.domainToUi() =
         urlEvent = urlEvent,
         locale = locale,
         urlImage = urlImage,
-        month = startEventDateTime.totoDate("MMM"),
-        day = startEventDateTime.totoDate("dd"),
+        date = startEventDateTime.totoDate("MMM dd"),
         startDateTime = startEventDateTime.totoDate("EEE, dd MMM yyyy HH:mm"),
         salesDateTime = sales.salesDateTime("dd MMM HH:mm"),
-        venues = venues,
+        locationPlace = venues.firstOrNull()?.name.orEmpty(),
+        locationAddress = "${venues.firstOrNull()?.city.orEmpty()}, ${venues.firstOrNull()?.stateCode.orEmpty()}",
+        locationCoordinates = venues.firstOrNull()?.location ?: Location(0.0, 0.0),
         segment = segment,
         info = info,
         eventType = eventType,
+        seatMap = seatMap,
         imageFavorite = getImageFavorite(eventType),
     )
 

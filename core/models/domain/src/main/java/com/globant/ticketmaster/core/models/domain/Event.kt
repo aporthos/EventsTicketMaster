@@ -17,5 +17,6 @@ data class Event(
     val sales: Sales,
     val segment: String,
     val info: String,
+    val seatMap: String,
     val page: Int,
 )

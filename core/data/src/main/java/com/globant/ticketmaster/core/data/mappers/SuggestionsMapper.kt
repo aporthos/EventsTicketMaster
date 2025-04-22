@@ -19,6 +19,7 @@ fun SuggestionsWithEventsEntity.entityToDomain() =
         idClassification = event.idClassification,
         sales = event.sales.entityToDomain(),
         info = event.info,
+        seatMap = event.seatMap,
         segment = event.segment,
         page = event.page,
     )

@@ -1,38 +1,41 @@
 package com.globant.ticketmaster.feature.detailevent
 
-import androidx.compose.foundation.layout.Arrangement
+import android.content.Intent
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import com.globant.ticketmaster.core.common.EventType
-import com.globant.ticketmaster.core.models.domain.Location
-import com.globant.ticketmaster.core.models.domain.Venues
+import com.globant.ticketmaster.core.common.shareEvent
 import com.globant.ticketmaster.core.models.ui.EventUi
+import com.globant.ticketmaster.core.ui.ImageEvent
 import com.globant.ticketmaster.core.ui.LoadingScreen
+import com.globant.ticketmaster.core.ui.event
 import com.globant.ticketmaster.feature.detailevent.components.EventTopAppBar
 import kotlinx.serialization.Serializable
 import com.globant.ticketmaster.core.designsystem.R as Designsystem
@@ -50,11 +53,28 @@ fun DetailEventRoute(
     onBackClick: () -> Unit,
 ) {
     val eventState by viewModel.eventState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     DetailEventRoute(
         name = name,
         eventUiState = eventState,
         onFavoriteClick = viewModel::updateFavoriteEvent,
         onBackClick = onBackClick,
+        onLocationClick = {
+            val intent =
+                Intent(Intent.ACTION_VIEW).apply {
+                    data =
+                        it.locationNavigation.toUri()
+                    setPackage("com.google.android.apps.maps")
+                }
+            context.startActivity(intent)
+        },
+        onShareClick = {
+            context.shareEvent(context.getString(R.string.share_event, it.urlEvent))
+        },
+        onBuyTicketsClick = {
+            val browserIntent = Intent(Intent.ACTION_VIEW, it.urlEvent.toUri())
+            context.startActivity(browserIntent)
+        },
     )
 }
 
@@ -64,13 +84,21 @@ fun DetailEventRoute(
     eventUiState: EventUiState,
     onBackClick: () -> Unit,
     onFavoriteClick: (EventUi) -> Unit,
+    onLocationClick: (EventUi) -> Unit,
+    onShareClick: (EventUi) -> Unit,
+    onBuyTicketsClick: (EventUi) -> Unit,
 ) {
+    val event = (eventUiState as? EventUiState.Success)?.event
     Scaffold(
         topBar = {
-            EventTopAppBar(
-                name = name,
-                onBackClick = onBackClick,
-            )
+            event?.let {
+                EventTopAppBar(
+                    event = event,
+                    onBackClick = onBackClick,
+                    onFavoriteClick = onFavoriteClick,
+                    onShareClick = onShareClick,
+                )
+            }
         },
         content = { paddingValues ->
             when (eventUiState) {
@@ -80,7 +108,8 @@ fun DetailEventRoute(
                     DetailEvent(
                         modifier = Modifier.padding(paddingValues),
                         event = eventUiState.event,
-                        onFavoriteClick = onFavoriteClick,
+                        onLocationClick = onLocationClick,
+                        onBuyTicketsClick = onBuyTicketsClick,
                     )
                 }
             }
@@ -92,66 +121,157 @@ fun DetailEventRoute(
 fun DetailEvent(
     modifier: Modifier = Modifier,
     event: EventUi,
-    onFavoriteClick: (EventUi) -> Unit,
+    onLocationClick: (EventUi) -> Unit,
+    onBuyTicketsClick: (EventUi) -> Unit,
 ) {
-    Column(
+    Box(
         modifier = modifier.fillMaxSize(),
     ) {
-        AsyncImage(
+        DetailEventsItems(event, onLocationClick)
+        Button(
             modifier =
                 Modifier
-                    .fillMaxHeight(0.3f)
-                    .clip(RoundedCornerShape(5.dp, 5.dp, 5.dp, 5.dp)),
-            contentScale = ContentScale.Crop,
-            model =
-                ImageRequest
-                    .Builder(LocalContext.current)
-                    .data(event.urlImage)
-                    .build(),
-            placeholder = painterResource(Designsystem.drawable.placeholder),
-            error = painterResource(Designsystem.drawable.placeholder),
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(horizontal = 16.dp),
+            onClick = { onBuyTicketsClick(event) },
+        ) {
+            Text(text = stringResource(R.string.buy_tickets))
+        }
+    }
+}
+
+@Composable
+fun DetailEventsItems(
+    event: EventUi,
+    onLocationClick: (EventUi) -> Unit,
+) {
+    LazyColumn(
+        modifier =
+            Modifier
+                .fillMaxSize(),
+    ) {
+        item {
+            Box {
+                ImageEvent(
+                    event.urlImage,
+                    Modifier.fillMaxWidth(),
+                )
+                Column(
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomStart)
+                            .fillMaxWidth()
+                            .background(
+                                Color.Black.copy(alpha = 0.3f),
+                            )
+                            .padding(8.dp),
+                ) {
+                    Text(
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Color.White,
+                        text = event.name,
+                    )
+                }
+            }
+        }
+        item {
+            EventItem(
+                title = event.startDateTime,
+                description = stringResource(R.string.start_date),
+                icon = Designsystem.drawable.events,
+            )
+        }
+
+        item {
+            EventItem(
+                title = event.locationPlace,
+                description = event.locationAddress,
+                icon = Designsystem.drawable.location,
+            ) {
+                onLocationClick(event)
+            }
+        }
+
+        item {
+            EventItem(
+                title = event.segment,
+                description = stringResource(R.string.category),
+                icon = Designsystem.drawable.label,
+            )
+        }
+
+        item {
+            EventItem(
+                title = event.salesDateTime,
+                description = stringResource(R.string.date_sales),
+                icon = Designsystem.drawable.sales,
+            )
+        }
+
+        item {
+            Column(
+                modifier = Modifier.padding(8.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.about),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+                Text(
+                    text = event.info,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+        }
+
+        item {
+            if (event.seatMap.isNotEmpty()) {
+                Column(
+                    modifier = Modifier.padding(8.dp),
+                ) {
+                    ImageEvent(
+                        event.seatMap,
+                        Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+        }
+        item {
+            Spacer(modifier = Modifier.height(60.dp))
+        }
+    }
+}
+
+@Composable
+fun EventItem(
+    title: String,
+    description: String,
+    @DrawableRes icon: Int,
+    onClick: () -> Unit = {},
+) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .clickable { onClick() },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(icon),
             contentDescription = null,
         )
-        if (event.venues.isNotEmpty()) {
-            Text(
-                style = MaterialTheme.typography.titleLarge,
-                text = event.venues.first().name,
-            )
-            Text(text = "${event.venues.first().city}, ${event.venues.first().stateCode}")
-        }
-        Text(text = event.startDateTime)
-        Text(text = event.info)
-        Text(text = event.segment)
-
-        Text("Ventas disponibles:")
-        Text(text = event.salesDateTime)
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        Column(
+            modifier = Modifier.padding(start = 8.dp),
         ) {
-            Spacer(modifier = Modifier.weight(1f))
-            FloatingActionButton(onClick = { onFavoriteClick(event) }, shape = CircleShape) {
-                Icon(
-                    painter = painterResource(id = event.imageFavorite),
-                    contentDescription = null,
-                )
-            }
-
-            FloatingActionButton(onClick = {}, shape = CircleShape) {
-                Icon(
-                    painter = painterResource(id = Designsystem.drawable.share),
-                    contentDescription = null,
-                )
-            }
-
-            FloatingActionButton(onClick = {}, shape = CircleShape) {
-                Icon(
-                    painter = painterResource(id = Designsystem.drawable.location),
-                    contentDescription = null,
-                )
-            }
-            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.labelSmall,
+            )
         }
     }
 }
@@ -160,41 +280,8 @@ fun DetailEvent(
 @Composable
 private fun DetailEventPreview() {
     DetailEvent(
-        onFavoriteClick = {},
-        event =
-            EventUi(
-                idEvent = "blandit",
-                name = "Dominic Cherry",
-                type = "hinc",
-                urlEvent = "https://www.google.com/#q=praesent",
-                locale = "venenatis",
-                urlImage = "https://duckduckgo.com/?q=persequeris",
-                month = "Sept",
-                day = "18",
-                startDateTime = "2025-04-23T01:30:00Z",
-                info = "semper",
-                salesDateTime = "2025-04-23T01:30:00Z",
-                segment = "Sports",
-                venues =
-                    listOf(
-                        Venues(
-                            idVenue = "",
-                            name = "Estadio GNP Seguros",
-                            urlVenue = "https://www.ticketmaster.com.mx/estadio-gnp-seguros-tickets-ciudad-de-mexico/venue/163903",
-                            city = "Ciudad de México",
-                            state = "Ciudad de México",
-                            country = "Mexico",
-                            address = "Viaducto Piedad y Río Churubusco s/n Cd. Deportiva",
-                            stateCode = "CDMX",
-                            location =
-                                Location(
-                                    latitude = 0.0,
-                                    longitude = 0.0,
-                                ),
-                        ),
-                    ),
-                eventType = EventType.Favorite,
-                imageFavorite = Designsystem.drawable.favorite_unselected,
-            ),
+        onLocationClick = {},
+        onBuyTicketsClick = {},
+        event = event,
     )
 }

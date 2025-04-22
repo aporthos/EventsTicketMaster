@@ -19,6 +19,7 @@ data class EventEntity(
     val idClassification: String,
     val info: String,
     val segment: String,
+    val seatMap: String,
     val page: Int,
     @Embedded val sales: SalesEntity,
 )

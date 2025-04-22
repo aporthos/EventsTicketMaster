@@ -35,7 +35,8 @@ class FavoritesViewModel
                 .debounce(500)
                 .flatMapLatest { search ->
                     getFavoritesEventsUseCase(GetFavoritesEventsUseCase.Params(search, "MX"))
-                }.map { paging ->
+                }.debounce(500)
+                .map { paging ->
                     paging.map(Event::domainToUi)
                 }.cachedIn(viewModelScope)
 
