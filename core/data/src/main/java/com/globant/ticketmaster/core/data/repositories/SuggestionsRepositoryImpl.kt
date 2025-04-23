@@ -22,28 +22,36 @@ class SuggestionsRepositoryImpl
         private val classifications: ClassificationsLocalDataSource,
         @IoDispatcher private val dispatcher: CoroutineDispatcher,
     ) : SuggestionsRepository {
-        override fun getSuggestions(countryCode: String): Flow<Result<List<Event>>> =
+        override fun getSuggestionsStream(countryCode: String): Flow<Result<List<Event>>> =
             object : ManagerCacheNetwork<List<Event>>() {
                 override suspend fun shouldFetch(data: List<Event>): Boolean = data.isEmpty()
 
                 override fun fetchLocal(): Flow<List<Event>> = localSuggestions.getSuggestionsEvents(countryCode)
 
-                override suspend fun fetchRemote(): Result<List<Event>> {
-                    val ids =
-                        classifications
-                            .getClassificationsStream()
-                            .first()
-                            .joinToString { it.idClassification }
-                            .replace(" ", "")
-                    return remote.getSuggestionsEvents(
-                        countryCode,
-                        ids,
-                    )
-                }
+                override suspend fun fetchRemote(): Result<List<Event>> = callService(countryCode)
 
                 override suspend fun saveResult(items: List<Event>) {
                     localEvents.addEvents(items)
                     localSuggestions.addSuggestionsEvents(items)
                 }
             }.asFlow().flowOn(dispatcher)
+
+        override suspend fun refreshSuggestions(countryCode: String): Result<List<Event>> =
+            callService(countryCode).onSuccess {
+                localEvents.addEvents(it)
+                localSuggestions.addSuggestionsEvents(it)
+            }
+
+        private suspend fun callService(countryCode: String): Result<List<Event>> {
+            val ids =
+                classifications
+                    .getClassificationsStream()
+                    .first()
+                    .joinToString { it.idClassification }
+                    .replace(" ", "")
+            return remote.getSuggestionsEvents(
+                countryCode,
+                ids,
+            )
+        }
     }

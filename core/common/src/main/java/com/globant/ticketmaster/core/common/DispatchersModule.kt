@@ -1,8 +1,11 @@
 package com.globant.ticketmaster.core.common
 
+import android.content.Context
+import android.content.res.Resources
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -35,6 +38,15 @@ object DispatchersModule {
     fun providesMainCoroutineScope(
         @MainDispatcher dispatcher: CoroutineDispatcher,
     ): CoroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object CommonModule {
+    @Provides
+    fun providesResources(
+        @ApplicationContext context: Context,
+    ): Resources = context.resources
 }
 
 @Retention(AnnotationRetention.BINARY)

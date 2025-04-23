@@ -52,16 +52,16 @@ fun TicketMasterAppNavHost(appState: TicketMasterAppState) {
         composable<AppSections.Home> {
             HomeMainContainer(
                 items = appState.bottomBarRoutes,
-                onEventClick = {
+                navigateToDetailEvent = {
                     appState.navigateToDetailEvent(DetailEvent(it.idEvent, it.name))
                 },
-                onClassificationClick = {
+                navigateToClassification = {
                     appState.navigateToSearchEvents(SearchEvents(it.idClassification))
                 },
-                onSearchClick = {
+                navigateToSearch = {
                     appState.navigateToSearchEvents(SearchEvents(""))
                 },
-                onLastVisitedClick = {
+                navigateToLastVisited = {
                     appState.navigateToLastVisitedEvent(LastVisited)
                 },
             )
@@ -95,10 +95,10 @@ fun TicketMasterAppNavHost(appState: TicketMasterAppState) {
 @Composable
 fun HomeMainContainer(
     items: List<HomeSections>,
-    onEventClick: (EventUi) -> Unit,
-    onSearchClick: () -> Unit,
-    onClassificationClick: (Classification) -> Unit,
-    onLastVisitedClick: () -> Unit,
+    navigateToDetailEvent: (EventUi) -> Unit,
+    navigateToSearch: () -> Unit,
+    navigateToClassification: (Classification) -> Unit,
+    navigateToLastVisited: () -> Unit,
 ) {
     val appState = rememberTicketMasterAppState()
     val backStackEntry by appState.navController.currentBackStackEntryAsState()
@@ -119,14 +119,14 @@ fun HomeMainContainer(
         ) {
             composable(HomeSections.Events.route) {
                 EventsRoute(
-                    onEventClick = onEventClick,
-                    onSearchClick = onSearchClick,
-                    onClassificationClick = onClassificationClick,
-                    onLastVisitedClick = onLastVisitedClick,
+                    navigateToDetailEvent = navigateToDetailEvent,
+                    navigateToSearch = navigateToSearch,
+                    navigateToClassification = navigateToClassification,
+                    navigateToLastVisited = navigateToLastVisited,
                 )
             }
             composable(HomeSections.Favorites.route) {
-                FavoritesRoute(onEventClick)
+                FavoritesRoute(navigateToDetailEvent)
             }
         }
     })

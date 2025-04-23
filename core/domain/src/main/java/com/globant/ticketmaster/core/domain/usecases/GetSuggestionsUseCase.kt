@@ -23,7 +23,7 @@ class GetSuggestionsUseCase
 
         override fun execute(params: Params): Flow<HomeResult> =
             combine(
-                suggestionsRepository.getSuggestions(params.countryCode),
+                suggestionsRepository.getSuggestionsStream(params.countryCode),
                 eventsRepository.getLastVisitedEvents(params.countryCode),
             ) { suggestions, events ->
                 HomeResult(

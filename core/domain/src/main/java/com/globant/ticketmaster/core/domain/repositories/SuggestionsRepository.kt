@@ -4,5 +4,7 @@ import com.globant.ticketmaster.core.models.domain.Event
 import kotlinx.coroutines.flow.Flow
 
 interface SuggestionsRepository {
-    fun getSuggestions(countryCode: String): Flow<Result<List<Event>>>
+    fun getSuggestionsStream(countryCode: String): Flow<Result<List<Event>>>
+
+    suspend fun refreshSuggestions(countryCode: String): Result<List<Event>>
 }

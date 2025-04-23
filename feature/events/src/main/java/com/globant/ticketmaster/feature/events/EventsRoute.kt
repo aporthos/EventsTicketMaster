@@ -23,51 +23,60 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.globant.ticketmaster.core.common.showToast
 import com.globant.ticketmaster.core.models.domain.Classification
 import com.globant.ticketmaster.core.models.ui.EventUi
 import com.globant.ticketmaster.core.ui.EventLargeItem
+import com.globant.ticketmaster.core.ui.LaunchViewEffect
 import com.globant.ticketmaster.core.ui.LoadingScreen
 import com.globant.ticketmaster.core.designsystem.R as DesignSystem
 
 @Composable
 fun EventsRoute(
-    onEventClick: (EventUi) -> Unit,
-    onSearchClick: () -> Unit,
-    onClassificationClick: (Classification) -> Unit,
-    onLastVisitedClick: () -> Unit,
+    navigateToDetailEvent: (EventUi) -> Unit,
+    navigateToSearch: () -> Unit,
+    navigateToClassification: (Classification) -> Unit,
+    navigateToLastVisited: () -> Unit,
     viewModel: EventsViewModel = hiltViewModel(),
 ) {
     val eventsState by viewModel.suggestionsEventsState.collectAsStateWithLifecycle()
     val classificationsState by viewModel.classificationsState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
     EventsRoute(
         eventsState = eventsState,
         classificationsState = classificationsState,
-        onEventClick = onEventClick,
-        onClassificationClick = onClassificationClick,
-        onSearchClick = onSearchClick,
-        onFavoriteClick = viewModel::updateFavoriteEvent,
-        onLastVisitedClick = onLastVisitedClick,
+        onEvents = viewModel::onTriggerEvent,
     )
+
+    LaunchViewEffect(viewModel) { effect ->
+        when (effect) {
+            is EventsEffects.ShowError -> context.showToast(effect.message)
+            is EventsEffects.Success -> context.showToast(effect.message)
+            is EventsEffects.NavigateToDetailEvent -> navigateToDetailEvent(effect.event)
+            EventsEffects.NavigateToSearch -> navigateToSearch()
+            is EventsEffects.NavigateToClassification -> navigateToClassification(effect.classification)
+            EventsEffects.NavigateToLastVisited -> navigateToLastVisited()
+        }
+    }
 }
 
 @Composable
 fun EventsRoute(
     eventsState: EventsUiState,
     classificationsState: ClassificationsUiState,
-    onEventClick: (EventUi) -> Unit,
-    onFavoriteClick: (EventUi) -> Unit,
-    onSearchClick: () -> Unit,
-    onClassificationClick: (Classification) -> Unit,
-    onLastVisitedClick: () -> Unit,
+    onEvents: (EventsUiEvents) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -75,7 +84,7 @@ fun EventsRoute(
                 title = { Text(text = stringResource(R.string.title_events)) },
                 actions = {
                     IconButton(onClick = {
-                        onSearchClick()
+                        onEvents(EventsUiEvents.NavigateToSearch)
                     }) {
                         Icon(
                             painter = painterResource(id = DesignSystem.drawable.search),
@@ -86,17 +95,21 @@ fun EventsRoute(
             )
         },
         content = { paddingValues ->
-            Column(
+            PullToRefreshBox(
                 modifier = Modifier.padding(paddingValues),
+                isRefreshing = (eventsState as? EventsUiState.Items)?.isRefreshing == true,
+                onRefresh = {
+                    onEvents(EventsUiEvents.OnRefresh)
+                },
             ) {
-                SectionClassifications(classificationsState, onClassificationClick)
-                Spacer(modifier = Modifier.width(8.dp))
-                SectionEvents(
-                    eventsState = eventsState,
-                    onEventClick = onEventClick,
-                    onFavoriteClick = onFavoriteClick,
-                    onLastVisitedClick = onLastVisitedClick,
-                )
+                Column {
+                    SectionClassifications(classificationsState, onEvents)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    SectionEvents(
+                        eventsState = eventsState,
+                        onEvents = onEvents,
+                    )
+                }
             }
         },
     )
@@ -106,9 +119,7 @@ fun EventsRoute(
 @Composable
 fun SectionEvents(
     eventsState: EventsUiState,
-    onEventClick: (EventUi) -> Unit,
-    onFavoriteClick: (EventUi) -> Unit,
-    onLastVisitedClick: () -> Unit,
+    onEvents: (EventsUiEvents) -> Unit,
 ) {
     when (eventsState) {
         EventsUiState.Error -> {
@@ -133,7 +144,7 @@ fun SectionEvents(
                                 text = stringResource(R.string.section_last_visited),
                                 style = MaterialTheme.typography.titleLarge,
                             )
-                            TextButton(onClick = { onLastVisitedClick() }) {
+                            TextButton(onClick = { onEvents(EventsUiEvents.NavigateToLastVisited) }) {
                                 Text(
                                     text = stringResource(R.string.section_view_more),
                                     style = MaterialTheme.typography.labelLarge,
@@ -145,7 +156,11 @@ fun SectionEvents(
                 item {
                     LazyRow {
                         items(eventsState.lastVisitedEvents) { item ->
-                            EventLargeItem(item, onEventClick, onFavoriteClick)
+                            EventLargeItem(item, onEventClick = {
+                                onEvents(EventsUiEvents.NavigateToDetail(item))
+                            }, onFavoriteClick = {
+                                onEvents(EventsUiEvents.UpdateFavoriteEvent(item))
+                            })
                         }
                     }
                 }
@@ -161,7 +176,11 @@ fun SectionEvents(
                     )
                 }
                 items(eventsState.suggestionsEvents) { item ->
-                    EventLargeItem(item, onEventClick, onFavoriteClick)
+                    EventLargeItem(item, onEventClick = {
+                        onEvents(EventsUiEvents.NavigateToDetail(item))
+                    }, onFavoriteClick = {
+                        onEvents(EventsUiEvents.UpdateFavoriteEvent(item))
+                    })
                 }
             }
         }
@@ -171,7 +190,7 @@ fun SectionEvents(
 @Composable
 fun SectionClassifications(
     classificationsState: ClassificationsUiState,
-    onClassificationClick: (Classification) -> Unit,
+    onEvents: (EventsUiEvents) -> Unit,
 ) {
     when (classificationsState) {
         ClassificationsUiState.Error -> {
@@ -198,7 +217,7 @@ fun SectionClassifications(
                         modifier =
                             Modifier
                                 .padding(horizontal = 2.dp)
-                                .clickable { onClassificationClick(item) },
+                                .clickable { onEvents(EventsUiEvents.NavigateToClassification(item)) },
                     ) {
                         Text(
                             style = MaterialTheme.typography.titleLarge,

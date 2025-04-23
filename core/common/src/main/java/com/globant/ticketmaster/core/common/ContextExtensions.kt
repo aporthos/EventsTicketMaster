@@ -2,6 +2,7 @@ package com.globant.ticketmaster.core.common
 
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 
 fun Context.shareEvent(message: String) {
     val sendIntent =
@@ -12,4 +13,8 @@ fun Context.shareEvent(message: String) {
         }
     val shareIntent = Intent.createChooser(sendIntent, null)
     startActivity(shareIntent)
+}
+
+fun Context.showToast(message: String) {
+    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 }

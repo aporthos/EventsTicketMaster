@@ -4,4 +4,6 @@
     <string name="section_suggestions">Sugerencias</string>
     <string name="section_last_visited">Ultimos visitados</string>
     <string name="section_view_more">Ver más</string>
+    <string name="error_message">Ups! Algo salio mal</string>
+    <string name="success_message">Se actualizo correctamente</string>
 </resources>
