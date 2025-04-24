@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="button_start">Empezar</string>
+    <string name="button_next">Siguiente</string>
+    <string name="button_skip">Saltar</string>
+    <string name="title_events">Eventos mas recientes</string>
+    <string name="message_events">Busca tus eventos mas recientes.</string>
+    <string name="title_favorites">Sección tus favoritos</string>
+    <string name="message_favorites">Guarda tus eventos favoritos :)</string>
+    <string name="title_last_visited">Eventos vistos ultimamente</string>
+    <string name="message_last_visited">Revisa los eventos mas recientes</string>
+    <string name="title_verbs">Verbos más comunes</string>
+    <string name="message_verbs">Obten un listado de más de 400 verbos.</string>
+</resources>

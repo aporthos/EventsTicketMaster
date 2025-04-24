@@ -62,6 +62,7 @@ dependencies {
 
     implementation(libs.timber)
     implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.datastore)
 
     implementation(project(":core:domain"))
     implementation(project(":core:database"))

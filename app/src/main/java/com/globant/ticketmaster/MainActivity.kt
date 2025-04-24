@@ -4,12 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -22,31 +24,44 @@ import com.globant.ticketmaster.feature.events.EventsRoute
 import com.globant.ticketmaster.feature.favorites.FavoritesRoute
 import com.globant.ticketmaster.feature.lastvisited.LastVisited
 import com.globant.ticketmaster.feature.lastvisited.LastVisitedRoute
+import com.globant.ticketmaster.feature.onboarding.OnboardingRoute
 import com.globant.ticketmaster.feature.searchevent.SearchEvents
 import com.globant.ticketmaster.feature.searchevent.SearchEventsRoute
+import com.globant.ticketmaster.navigation.AppSections
+import com.globant.ticketmaster.navigation.HomeSections
+import com.globant.ticketmaster.navigation.MainBottomAppBar
+import com.globant.ticketmaster.navigation.TicketMasterAppState
+import com.globant.ticketmaster.navigation.rememberTicketMasterAppState
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val viewModel: MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             val appState = rememberTicketMasterAppState()
             ChallengeTicketmasterTheme {
-                TicketMasterAppNavHost(appState)
+                val startDestination by viewModel.showOnboarding.collectAsStateWithLifecycle()
+                TicketMasterAppNavHost(appState, startDestination)
             }
         }
     }
 }
 
 @Composable
-fun TicketMasterAppNavHost(appState: TicketMasterAppState) {
+fun TicketMasterAppNavHost(
+    appState: TicketMasterAppState,
+    startDestination: AppSections,
+) {
     NavHost(
         navController = appState.navController,
-        startDestination = AppSections.Home,
+        startDestination = startDestination,
     ) {
         composable<AppSections.Onboarding> {
+            OnboardingRoute()
         }
         composable<AppSections.Home> {
             HomeMainContainer(

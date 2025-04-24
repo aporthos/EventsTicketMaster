@@ -55,8 +55,12 @@ dependencies {
 
     implementation(libs.timber)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.lottie.compose)
 
     implementation(project(":core:designsystem"))
+    implementation(project(":core:models:ui"))
+    implementation(project(":core:domain"))
+    implementation(project(":core:common"))
 
     testImplementation(libs.junit)
 }

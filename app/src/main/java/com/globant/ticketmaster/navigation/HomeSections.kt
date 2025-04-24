@@ -1,6 +1,7 @@
-package com.globant.ticketmaster
+package com.globant.ticketmaster.navigation
 
 import androidx.annotation.DrawableRes
+import com.globant.ticketmaster.R
 import com.globant.ticketmaster.core.designsystem.R as Designsystem
 
 const val ROUTE_EVENTS = "events"

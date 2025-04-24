@@ -1,4 +1,4 @@
-package com.globant.ticketmaster
+package com.globant.ticketmaster.navigation
 
 import kotlinx.serialization.Serializable
 

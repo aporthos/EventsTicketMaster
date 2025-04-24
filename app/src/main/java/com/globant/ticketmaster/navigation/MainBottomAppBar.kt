@@ -1,4 +1,4 @@
-package com.globant.ticketmaster
+package com.globant.ticketmaster.navigation
 
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
