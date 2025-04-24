@@ -3,17 +3,21 @@ package com.globant.ticketmaster.feature.events
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +34,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.globant.ticketmaster.core.common.showToast
 import com.globant.ticketmaster.core.models.domain.Classification
 import com.globant.ticketmaster.core.models.ui.EventUi
@@ -38,6 +46,7 @@ import com.globant.ticketmaster.core.ui.LaunchViewEffect
 import com.globant.ticketmaster.core.ui.LoadingScreen
 import com.globant.ticketmaster.feature.countries.CountriesUiState
 import com.globant.ticketmaster.feature.events.components.EventsTopAppBar
+import com.globant.ticketmaster.core.designsystem.R as DesignSystem
 
 @Composable
 fun EventsRoute(
@@ -111,6 +120,39 @@ fun SectionEvents(
 ) {
     when (eventsState) {
         EventsUiState.Error -> {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                val composition by rememberLottieComposition(
+                    LottieCompositionSpec.RawRes(DesignSystem.raw.error),
+                )
+                val progress by animateLottieCompositionAsState(
+                    composition = composition,
+                    iterations = 1,
+                )
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    LottieAnimation(
+                        modifier =
+                            Modifier
+                                .size(150.dp),
+                        composition = composition,
+                        progress = { progress },
+                    )
+                    Button(onClick = {
+                        onEvents(EventsUiEvents.OnRetry)
+                    }) {
+                        Text(text = stringResource(R.string.retry))
+                    }
+                }
+            }
         }
 
         EventsUiState.Loading -> LoadingScreen()
@@ -132,11 +174,13 @@ fun SectionEvents(
                                 text = stringResource(R.string.section_last_visited),
                                 style = MaterialTheme.typography.titleLarge,
                             )
-                            TextButton(onClick = { onEvents(EventsUiEvents.NavigateToLastVisited) }) {
-                                Text(
-                                    text = stringResource(R.string.section_view_more),
-                                    style = MaterialTheme.typography.labelLarge,
-                                )
+                            if (eventsState.lastVisitedEvents.size > 3) {
+                                TextButton(onClick = { onEvents(EventsUiEvents.NavigateToLastVisited) }) {
+                                    Text(
+                                        text = stringResource(R.string.section_view_more),
+                                        style = MaterialTheme.typography.labelLarge,
+                                    )
+                                }
                             }
                         }
                     }

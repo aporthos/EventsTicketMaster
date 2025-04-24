@@ -40,6 +40,8 @@ sealed interface EventsUiEvents : ViewEvent {
     data class OnSelectCountry(
         val country: CountryEventUi,
     ) : EventsUiEvents
+
+    data object OnRetry : EventsUiEvents
 }
 
 sealed interface EventsEffects : ViewEffect {

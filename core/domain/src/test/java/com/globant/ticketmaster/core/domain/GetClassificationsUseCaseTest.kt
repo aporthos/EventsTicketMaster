@@ -29,17 +29,17 @@ class GetClassificationsUseCaseTest {
     @Test
     fun `validation use case with data`() =
         runTest {
-            whenever(repository.getClassifications()).thenReturn(flowOf(data))
+            whenever(repository.getClassifications()).thenReturn(flowOf(Result.success(data)))
             val result = useCase(Unit)
-            assertEquals(result.first(), data)
+            assertEquals(result.first().getOrElse { emptyList() }, data)
         }
 
     @Test
     fun `validation use case with empty data`() =
         runTest {
-            whenever(repository.getClassifications()).thenReturn(flowOf(emptyList()))
+            whenever(repository.getClassifications()).thenReturn(flowOf(Result.success(emptyList())))
             val result = useCase(Unit)
-            assertEquals(result.first(), emptyList<Classification>())
+            assertEquals(result.first().getOrElse { emptyList() }, emptyList<Classification>())
         }
 
     private val data =

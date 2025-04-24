@@ -6,4 +6,5 @@
     <string name="section_view_more">Ver más</string>
     <string name="error_message">Ups! Algo salio mal</string>
     <string name="success_message">Se actualizo correctamente</string>
+    <string name="retry">Reintentar</string>
 </resources>

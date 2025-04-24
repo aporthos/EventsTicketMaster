@@ -13,6 +13,6 @@ class GetClassificationsUseCase
     constructor(
         private val repository: ClassificationsRepository,
         @IoDispatcher private val dispatcher: CoroutineDispatcher,
-    ) : FlowSingleUseCase<Unit, List<Classification>>(dispatcher) {
-        override fun execute(params: Unit): Flow<List<Classification>> = repository.getClassifications()
+    ) : FlowSingleUseCase<Unit, Result<List<Classification>>>(dispatcher) {
+        override fun execute(params: Unit): Flow<Result<List<Classification>>> = repository.getClassifications()
     }

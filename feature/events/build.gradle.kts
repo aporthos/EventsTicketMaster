@@ -61,6 +61,7 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     implementation(libs.timber)
+    implementation(libs.lottie.compose)
 
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)

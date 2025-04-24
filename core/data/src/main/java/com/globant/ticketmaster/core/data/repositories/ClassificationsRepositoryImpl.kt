@@ -7,11 +7,7 @@ import com.globant.ticketmaster.core.domain.repositories.ClassificationsReposito
 import com.globant.ticketmaster.core.models.domain.Classification
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import timber.log.Timber
 import javax.inject.Inject
 
 class ClassificationsRepositoryImpl
@@ -21,20 +17,16 @@ class ClassificationsRepositoryImpl
         private val remote: ClassificationsRemoteDataSource,
         @IoDispatcher private val dispatcher: CoroutineDispatcher,
     ) : ClassificationsRepository {
-        override fun getClassifications(): Flow<List<Classification>> =
-            flow {
-                val cache = local.getClassificationsStream()
+        override fun getClassifications(): Flow<Result<List<Classification>>> =
+            object : ManagerCacheNetwork<List<Classification>>() {
+                override suspend fun shouldFetch(data: List<Classification>): Boolean = data.isEmpty()
 
-                if (cache.first().isEmpty()) {
-                    val result = remote.getClassifications()
-                    result
-                        .onSuccess {
-                            local.addClassifications(it)
-                        }.onFailure {
-                            Timber.e("getClassifications -> $it")
-                        }
+                override fun fetchLocal(): Flow<List<Classification>> = local.getClassificationsStream()
+
+                override suspend fun fetchRemote(): Result<List<Classification>> = remote.getClassifications()
+
+                override suspend fun saveResult(items: List<Classification>) {
+                    local.addClassifications(items)
                 }
-
-                emitAll(cache)
-            }.flowOn(dispatcher)
+            }.asFlow().flowOn(dispatcher)
     }

@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
     implementation(libs.androidx.paging.runtime)
+    implementation(libs.timber)
 
     implementation(project(":core:common"))
     implementation(project(":core:models:domain"))

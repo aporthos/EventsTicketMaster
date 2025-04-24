@@ -4,5 +4,5 @@ import com.globant.ticketmaster.core.models.domain.Classification
 import kotlinx.coroutines.flow.Flow
 
 interface ClassificationsRepository {
-    fun getClassifications(): Flow<List<Classification>>
+    fun getClassifications(): Flow<Result<List<Classification>>>
 }

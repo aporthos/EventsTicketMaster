@@ -2,10 +2,13 @@ package com.globant.ticketmaster.feature.events
 
 import app.cash.turbine.test
 import com.globant.ticketmaster.core.domain.usecases.GetClassificationsUseCase
+import com.globant.ticketmaster.core.domain.usecases.GetCountriesUseCase
 import com.globant.ticketmaster.core.domain.usecases.GetSuggestionsUseCase
+import com.globant.ticketmaster.core.domain.usecases.UpdateCountryUseCase
 import com.globant.ticketmaster.core.domain.usecases.UpdateFavoriteEventUseCase
 import com.globant.ticketmaster.core.domain.usecases.lastvisited.RefreshSuggestionsUseCase
 import com.globant.ticketmaster.core.testing.FakeClassificationsRepository
+import com.globant.ticketmaster.core.testing.FakeDataStoreRepository
 import com.globant.ticketmaster.core.testing.FakeEventsRepository
 import com.globant.ticketmaster.core.testing.FakeSuggestionsRepository
 import com.globant.ticketmaster.core.testing.MainDispatcherRule
@@ -32,29 +35,41 @@ class EventsViewModelTest {
 
     private val suggestionsRepository = FakeSuggestionsRepository()
 
-    private val getSuggestionsUseCase =
-        GetSuggestionsUseCase(
-            suggestionsRepository = suggestionsRepository,
-            eventsRepository = eventsRepository,
-            mainDispatcherRule.testDispatcher,
-        )
-
-    private val getClassificationsUseCase =
-        GetClassificationsUseCase(classificationsRepository, mainDispatcherRule.testDispatcher)
-
-    private val updateFavoriteEventUseCase =
-        UpdateFavoriteEventUseCase(eventsRepository, mainDispatcherRule.testDispatcher)
-
-    private val refreshSuggestionsUseCase =
-        RefreshSuggestionsUseCase(suggestionsRepository, mainDispatcherRule.testDispatcher)
-
+    private val countriesRepository = FakeDataStoreRepository()
     private val viewModel =
         EventsViewModel(
-            getSuggestionsEventsUseCase = getSuggestionsUseCase,
-            getClassificationsUseCase = getClassificationsUseCase,
-            updateFavoriteEventUseCase = updateFavoriteEventUseCase,
-            refreshSuggestionsUseCase = refreshSuggestionsUseCase,
+            getSuggestionsEventsUseCase =
+                GetSuggestionsUseCase(
+                    suggestionsRepository = suggestionsRepository,
+                    eventsRepository = eventsRepository,
+                    mainDispatcherRule.testDispatcher,
+                ),
+            getClassificationsUseCase =
+                GetClassificationsUseCase(
+                    classificationsRepository,
+                    mainDispatcherRule.testDispatcher,
+                ),
+            updateFavoriteEventUseCase =
+                UpdateFavoriteEventUseCase(
+                    eventsRepository,
+                    mainDispatcherRule.testDispatcher,
+                ),
+            refreshSuggestionsUseCase =
+                RefreshSuggestionsUseCase(
+                    suggestionsRepository,
+                    mainDispatcherRule.testDispatcher,
+                ),
             eventsResourcesManager = eventsResourcesManager,
+            getCountriesUseCase =
+                GetCountriesUseCase(
+                    countriesRepository,
+                    mainDispatcherRule.testDispatcher,
+                ),
+            updateCountryUseCase =
+                UpdateCountryUseCase(
+                    countriesRepository,
+                    mainDispatcherRule.testDispatcher,
+                ),
         )
 
     @Test
@@ -62,7 +77,13 @@ class EventsViewModelTest {
         runTest {
             viewModel.classificationsState.test {
                 assertEquals(ClassificationsUiState.Loading, awaitItem())
-                classificationsRepository.addClassification(listOf(classificationDomain))
+                classificationsRepository.addClassification(
+                    Result.success(
+                        listOf(
+                            classificationDomain,
+                        ),
+                    ),
+                )
                 assertEquals(
                     ClassificationsUiState.Items(listOf(classificationDomain)),
                     awaitItem(),

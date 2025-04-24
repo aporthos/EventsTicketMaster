@@ -22,8 +22,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -37,7 +37,7 @@ class EventsViewModel
     @Inject
     constructor(
         getSuggestionsEventsUseCase: GetSuggestionsUseCase,
-        getClassificationsUseCase: GetClassificationsUseCase,
+        private val getClassificationsUseCase: GetClassificationsUseCase,
         private val updateFavoriteEventUseCase: UpdateFavoriteEventUseCase,
         private val refreshSuggestionsUseCase: RefreshSuggestionsUseCase,
         getCountriesUseCase: GetCountriesUseCase,
@@ -70,14 +70,17 @@ class EventsViewModel
                                 ),
                             ),
                         ) { isRefreshing, events ->
-                            EventsUiState.Items(
-                                isRefreshing = isRefreshing,
-                                suggestionsEvents = events.suggestionsEvents.domainToUis(),
-                                lastVisitedEvents = events.lastVisitedEvents.domainToUis(),
-                            )
+                            if (events.suggestionsEvents.isEmpty() && events.lastVisitedEvents.isEmpty()) {
+                                EventsUiState.Error
+                            } else {
+                                EventsUiState.Items(
+                                    isRefreshing = isRefreshing,
+                                    suggestionsEvents = events.suggestionsEvents.domainToUis(),
+                                    lastVisitedEvents = events.lastVisitedEvents.domainToUis(),
+                                )
+                            }
                         }
-                }.distinctUntilChanged()
-                .stateIn(
+                }.stateIn(
                     scope = viewModelScope,
                     initialValue = EventsUiState.Loading,
                     started = SharingStarted.WhileSubscribed(),
@@ -86,6 +89,7 @@ class EventsViewModel
         val countriesState: StateFlow<CountriesUiState> =
             countriesLocal
                 .map { countries ->
+                    Timber.d("countriesState -> $countries")
                     if (countries.isEmpty()) {
                         CountriesUiState.Loading
                     } else {
@@ -105,8 +109,13 @@ class EventsViewModel
 
         val classificationsState: StateFlow<ClassificationsUiState> =
             getClassificationsUseCase(Unit)
-                .map(ClassificationsUiState::Items)
-                .stateIn(
+                .map {
+                    if (it.isSuccess) {
+                        ClassificationsUiState.Items(it.getOrElse { emptyList() })
+                    } else {
+                        ClassificationsUiState.Loading
+                    }
+                }.stateIn(
                     scope = viewModelScope,
                     initialValue = ClassificationsUiState.Loading,
                     started = SharingStarted.WhileSubscribed(),
@@ -129,6 +138,12 @@ class EventsViewModel
                     setEffect { EventsEffects.NavigateToLastVisited }
 
                 is EventsUiEvents.OnSelectCountry -> onSelectCountry(event.country)
+                EventsUiEvents.OnRetry -> {
+                    viewModelScope.launch {
+                        getClassificationsUseCase(Unit).collect()
+                    }
+                    onRefresh()
+                }
             }
         }
 

@@ -1,9 +1,11 @@
 package com.globant.ticketmaster.feature.detailevent
 
 import app.cash.turbine.test
+import com.globant.ticketmaster.core.domain.usecases.GetCountrySelectedUseCase
 import com.globant.ticketmaster.core.domain.usecases.GetDetailEventUseCase
 import com.globant.ticketmaster.core.domain.usecases.UpdateFavoriteEventUseCase
 import com.globant.ticketmaster.core.domain.usecases.lastvisited.AddLastVisitedEventUseCase
+import com.globant.ticketmaster.core.testing.FakeDataStoreRepository
 import com.globant.ticketmaster.core.testing.FakeEventsRepository
 import com.globant.ticketmaster.core.testing.MainDispatcherRule
 import com.globant.ticketmaster.core.testing.SavedStateHandleRule
@@ -59,6 +61,7 @@ class DetailEventViewModelTest {
                 getDetailEventUseCase = getDetailEventUseCase,
                 addLastVisitedEventUseCase = addLastVisitedEventUseCase,
                 updateFavoriteEventUseCase = updateFavoriteEventUseCase,
+                getCountrySelectedUseCase = GetCountrySelectedUseCase(FakeDataStoreRepository()),
             )
     }
 
