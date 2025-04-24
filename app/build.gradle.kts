@@ -88,4 +88,5 @@ dependencies {
     implementation(project(":feature:searchevent"))
     implementation(project(":feature:lastvisited"))
     implementation(project(":feature:onboarding"))
+    implementation(project(":feature:countries"))
 }

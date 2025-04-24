@@ -5,11 +5,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.globant.ticketmaster.core.common.EventType
+import com.globant.ticketmaster.core.domain.usecases.GetCountrySelectedUseCase
 import com.globant.ticketmaster.core.domain.usecases.UpdateFavoriteEventUseCase
 import com.globant.ticketmaster.core.domain.usecases.lastvisited.GetLastVisitedEventsPagingUseCase
 import com.globant.ticketmaster.core.models.domain.Event
 import com.globant.ticketmaster.core.models.ui.EventUi
-import com.globant.ticketmaster.core.models.ui.domainToUi
+import com.globant.ticketmaster.core.models.ui.domainToUis
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
@@ -24,6 +25,7 @@ class LastVisitedViewModel
     @Inject
     constructor(
         private val updateFavoriteEventUseCase: UpdateFavoriteEventUseCase,
+        private val getCountrySelectedUseCase: GetCountrySelectedUseCase,
         getLastVisitedEventsPagingUseCase: GetLastVisitedEventsPagingUseCase,
     ) : ViewModel() {
         private val search = MutableStateFlow("")
@@ -35,11 +37,11 @@ class LastVisitedViewModel
                     getLastVisitedEventsPagingUseCase(
                         GetLastVisitedEventsPagingUseCase.Params(
                             filters,
-                            "MX",
+                            getCountrySelectedUseCase(),
                         ),
                     )
                 }.map { paging ->
-                    paging.map(Event::domainToUi)
+                    paging.map(Event::domainToUis)
                 }.cachedIn(viewModelScope)
 
         fun onSearch(search: String) {

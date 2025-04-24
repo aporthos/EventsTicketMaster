@@ -22,7 +22,6 @@ class SuggestionsLocalDataSourceImpl
         override suspend fun addSuggestionsEvents(events: List<Event>): Boolean =
             withContext(dispatcher) {
                 val suggestions = events.map { SuggestionEventEntity(it.idEvent) }
-                suggestionsDao.deleteSuggestions()
                 suggestionsDao.insertOrIgnore(suggestions).isNotEmpty()
             }
 

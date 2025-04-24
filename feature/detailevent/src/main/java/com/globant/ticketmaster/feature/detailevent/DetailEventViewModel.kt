@@ -6,11 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.globant.ticketmaster.core.common.EventType
+import com.globant.ticketmaster.core.domain.usecases.GetCountrySelectedUseCase
 import com.globant.ticketmaster.core.domain.usecases.GetDetailEventUseCase
 import com.globant.ticketmaster.core.domain.usecases.UpdateFavoriteEventUseCase
 import com.globant.ticketmaster.core.domain.usecases.lastvisited.AddLastVisitedEventUseCase
 import com.globant.ticketmaster.core.models.ui.EventUi
-import com.globant.ticketmaster.core.models.ui.domainToUi
+import com.globant.ticketmaster.core.models.ui.domainToUis
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -29,6 +30,7 @@ class DetailEventViewModel
         getDetailEventUseCase: GetDetailEventUseCase,
         private val addLastVisitedEventUseCase: AddLastVisitedEventUseCase,
         private val updateFavoriteEventUseCase: UpdateFavoriteEventUseCase,
+        private val getCountrySelectedUseCase: GetCountrySelectedUseCase,
     ) : ViewModel() {
         @VisibleForTesting
         val idEvent = savedStateHandle.toRoute<DetailEvent>().idEvent
@@ -42,7 +44,7 @@ class DetailEventViewModel
         val eventState: StateFlow<EventUiState> =
             getDetailEventUseCase(GetDetailEventUseCase.Params(idEvent))
                 .map {
-                    EventUiState.Success(it.domainToUi())
+                    EventUiState.Success(it.domainToUis())
                 }.stateIn(
                     scope = viewModelScope,
                     initialValue = EventUiState.Loading,
@@ -54,7 +56,7 @@ class DetailEventViewModel
                 AddLastVisitedEventUseCase.Params(
                     idEvent = idEvent,
                     lastVisited = Date().time,
-                    countryCode = "MX",
+                    countryCode = getCountrySelectedUseCase(),
                 ),
             ).onFailure {
                 Timber.e("addLastVisitedEvent -> $it")

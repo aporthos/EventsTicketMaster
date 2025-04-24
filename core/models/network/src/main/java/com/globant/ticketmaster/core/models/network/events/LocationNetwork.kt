@@ -6,7 +6,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class LocationNetwork(
     @Json(name = "latitude")
-    val latitude: String,
+    val latitude: String?,
     @Json(name = "longitude")
-    val longitude: String,
+    val longitude: String?,
 )

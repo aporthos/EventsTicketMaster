@@ -16,20 +16,16 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,7 +36,8 @@ import com.globant.ticketmaster.core.models.ui.EventUi
 import com.globant.ticketmaster.core.ui.EventLargeItem
 import com.globant.ticketmaster.core.ui.LaunchViewEffect
 import com.globant.ticketmaster.core.ui.LoadingScreen
-import com.globant.ticketmaster.core.designsystem.R as DesignSystem
+import com.globant.ticketmaster.feature.countries.CountriesUiState
+import com.globant.ticketmaster.feature.events.components.EventsTopAppBar
 
 @Composable
 fun EventsRoute(
@@ -52,10 +49,12 @@ fun EventsRoute(
 ) {
     val eventsState by viewModel.suggestionsEventsState.collectAsStateWithLifecycle()
     val classificationsState by viewModel.classificationsState.collectAsStateWithLifecycle()
+    val countriesState by viewModel.countriesState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     EventsRoute(
         eventsState = eventsState,
+        countriesState = countriesState,
         classificationsState = classificationsState,
         onEvents = viewModel::onTriggerEvent,
     )
@@ -75,24 +74,13 @@ fun EventsRoute(
 @Composable
 fun EventsRoute(
     eventsState: EventsUiState,
+    countriesState: CountriesUiState,
     classificationsState: ClassificationsUiState,
     onEvents: (EventsUiEvents) -> Unit,
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(text = stringResource(R.string.title_events)) },
-                actions = {
-                    IconButton(onClick = {
-                        onEvents(EventsUiEvents.NavigateToSearch)
-                    }) {
-                        Icon(
-                            painter = painterResource(id = DesignSystem.drawable.search),
-                            contentDescription = null,
-                        )
-                    }
-                },
-            )
+            EventsTopAppBar(countriesState, onEvents)
         },
         content = { paddingValues ->
             PullToRefreshBox(
@@ -159,7 +147,7 @@ fun SectionEvents(
                             EventLargeItem(item, onEventClick = {
                                 onEvents(EventsUiEvents.NavigateToDetail(item))
                             }, onFavoriteClick = {
-                                onEvents(EventsUiEvents.UpdateFavoriteEvent(item))
+                                onEvents(EventsUiEvents.OnUpdateFavoriteEvent(item))
                             })
                         }
                     }
@@ -179,7 +167,7 @@ fun SectionEvents(
                     EventLargeItem(item, onEventClick = {
                         onEvents(EventsUiEvents.NavigateToDetail(item))
                     }, onFavoriteClick = {
-                        onEvents(EventsUiEvents.UpdateFavoriteEvent(item))
+                        onEvents(EventsUiEvents.OnUpdateFavoriteEvent(item))
                     })
                 }
             }

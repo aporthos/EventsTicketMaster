@@ -33,7 +33,7 @@ data class EventUi(
         "google.navigation:q=$${locationCoordinates.latitude},${locationCoordinates.longitude}&mode=d"
 }
 
-fun Event.domainToUi() =
+fun Event.domainToUis() =
     EventUi(
         idEvent = idEvent,
         name = name,
@@ -63,7 +63,7 @@ fun Long.totoDate(pattern: String): String {
     return SimpleDateFormat(pattern, Locale.getDefault()).format(Date(this))
 }
 
-fun List<Event>.domainToUis(): List<EventUi> = map(Event::domainToUi)
+fun List<Event>.domainToUis(): List<EventUi> = map(Event::domainToUis)
 
 private fun getImageFavorite(eventType: EventType): Int =
     if (eventType == EventType.Favorite) {

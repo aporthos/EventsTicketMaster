@@ -24,7 +24,4 @@ interface SuggestionsEventsDao {
     """,
     )
     fun getSuggestionsEvents(countryCode: String): Flow<List<SuggestionsWithEventsEntity>>
-
-    @Query("DELETE FROM suggestionsEvents")
-    suspend fun deleteSuggestions()
 }

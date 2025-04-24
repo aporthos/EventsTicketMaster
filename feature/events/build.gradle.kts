@@ -46,6 +46,7 @@ android {
     kotlinOptions.freeCompilerArgs +=
         listOf(
             "-Xopt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+            "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
         )
 }
 
@@ -74,6 +75,7 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:ui"))
     implementation(project(":core:testing"))
+    implementation(project(":feature:countries"))
 
     testImplementation(libs.junit)
     testImplementation(libs.mockito.kotlin)

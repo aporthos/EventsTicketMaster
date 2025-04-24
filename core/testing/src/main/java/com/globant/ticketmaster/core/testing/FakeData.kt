@@ -28,7 +28,7 @@ import com.globant.ticketmaster.core.models.network.events.LocationNetwork
 import com.globant.ticketmaster.core.models.network.events.SalesNetwork
 import com.globant.ticketmaster.core.models.network.events.State
 import com.globant.ticketmaster.core.models.network.events.VenuesNetwork
-import com.globant.ticketmaster.core.models.ui.domainToUi
+import com.globant.ticketmaster.core.models.ui.domainToUis
 
 val eventDomain =
     listOf(
@@ -297,5 +297,5 @@ val locationNetwork = LocationNetwork(latitude = "123", longitude = "456")
 val location = Location(latitude = 123.0, longitude = 456.0)
 val locationEntity = LocationEntity(latitude = 123.0, longitude = 456.0)
 val classification = Classification(idClassification = "phasellus", name = "Sherrie McClure")
-val eventUi = eventDomain.first().domainToUi()
-val eventsUi = listOf(eventDomain.first().domainToUi())
+val eventUi = eventDomain.first().domainToUis()
+val eventsUi = listOf(eventDomain.first().domainToUis())

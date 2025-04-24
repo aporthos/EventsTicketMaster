@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.globant.ticketmaster.feature.favorites"
+    namespace = "com.globant.ticketmaster.feature.countries"
     compileSdk =
         libs.versions.compileSdk
             .get()
@@ -42,42 +42,18 @@ android {
     buildFeatures {
         compose = true
     }
-
-    kotlinOptions.freeCompilerArgs +=
-        listOf(
-            "-Xopt-in=androidx.compose.material3.ExperimentalMaterial3Api",
-            "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xopt-in=kotlinx.coroutines.FlowPreview",
-        )
 }
 
 dependencies {
 
     implementation(libs.androidx.core.ktx)
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.material3)
 
-    implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)
-    kapt(libs.hilt.compiler)
-
-    implementation(libs.timber)
-
-    implementation(libs.androidx.paging.runtime)
-    implementation(libs.androidx.paging.compose)
-
-    implementation(project(":core:domain"))
-    implementation(project(":core:common"))
     implementation(project(":core:models:domain"))
     implementation(project(":core:models:ui"))
-    implementation(project(":core:ui"))
     implementation(project(":core:designsystem"))
-    implementation(project(":core:testing"))
-    implementation(project(":feature:countries"))
-
-    testImplementation(libs.junit)
-    testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.mockk)
-    testImplementation(libs.turbine)
+    implementation(project(":core:common"))
+    implementation(project(":core:domain"))
 }

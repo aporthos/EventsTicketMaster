@@ -7,11 +7,12 @@ import androidx.navigation.toRoute
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.globant.ticketmaster.core.common.EventType
+import com.globant.ticketmaster.core.domain.usecases.GetCountrySelectedUseCase
 import com.globant.ticketmaster.core.domain.usecases.GetEventsPagingUseCase
 import com.globant.ticketmaster.core.domain.usecases.UpdateFavoriteEventUseCase
 import com.globant.ticketmaster.core.models.domain.Event
 import com.globant.ticketmaster.core.models.ui.EventUi
-import com.globant.ticketmaster.core.models.ui.domainToUi
+import com.globant.ticketmaster.core.models.ui.domainToUis
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
@@ -29,13 +30,15 @@ class SearchEventsViewModel
         savedStateHandle: SavedStateHandle,
         private val getEventsPagingUseCase: GetEventsPagingUseCase,
         private val updateFavoriteEventUseCase: UpdateFavoriteEventUseCase,
+        getCountrySelectedUseCase: GetCountrySelectedUseCase,
     ) : ViewModel() {
         private val idClassification = savedStateHandle.toRoute<SearchEvents>().idClassification
+
         private val searchFilters =
             MutableStateFlow(
                 SearchFilters(
                     keyword = "",
-                    countryCode = "MX",
+                    countryCode = getCountrySelectedUseCase(),
                     idClassification = idClassification,
                 ),
             )
@@ -52,7 +55,7 @@ class SearchEventsViewModel
                         )
                     getEventsPagingUseCase(params)
                 }.map { paging ->
-                    paging.map(Event::domainToUi)
+                    paging.map(Event::domainToUis)
                 }.cachedIn(viewModelScope)
 
         fun onSearch(search: String) {

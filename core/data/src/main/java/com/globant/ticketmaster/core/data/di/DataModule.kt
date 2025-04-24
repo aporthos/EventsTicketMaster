@@ -20,6 +20,7 @@ import com.globant.ticketmaster.core.data.datasources.suggestions.SuggestionsLoc
 import com.globant.ticketmaster.core.data.datasources.suggestions.SuggestionsRemoteDataSource
 import com.globant.ticketmaster.core.data.datasources.suggestions.SuggestionsRemoteDataSourceImpl
 import com.globant.ticketmaster.core.data.repositories.ClassificationsRepositoryImpl
+import com.globant.ticketmaster.core.models.domain.CountryEvent
 import com.globant.ticketmaster.core.data.repositories.DataStoreRepositoryImpl
 import com.globant.ticketmaster.core.data.repositories.EventsRepositoryImpl
 import com.globant.ticketmaster.core.data.repositories.SuggestionsRepositoryImpl
@@ -27,6 +28,9 @@ import com.globant.ticketmaster.core.domain.repositories.ClassificationsReposito
 import com.globant.ticketmaster.core.domain.repositories.DataStoreRepository
 import com.globant.ticketmaster.core.domain.repositories.EventsRepository
 import com.globant.ticketmaster.core.domain.repositories.SuggestionsRepository
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -68,6 +72,12 @@ interface DataModule {
             PreferenceDataStoreFactory.create {
                 context.preferencesDataStoreFile(USER_DATASTORE)
             }
+
+        @Provides
+        fun providesCountryEventAdapter(moshi: Moshi): JsonAdapter<List<CountryEvent>> {
+            val type = Types.newParameterizedType(List::class.java, CountryEvent::class.java)
+            return moshi.adapter(type)
+        }
     }
 
     @Binds

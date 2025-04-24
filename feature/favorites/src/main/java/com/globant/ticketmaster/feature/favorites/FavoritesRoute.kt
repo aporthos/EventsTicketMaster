@@ -11,45 +11,56 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.globant.ticketmaster.core.models.ui.EventUi
 import com.globant.ticketmaster.core.ui.EmptyScreen
 import com.globant.ticketmaster.core.ui.EventItem
+import com.globant.ticketmaster.core.ui.LaunchViewEffect
 import com.globant.ticketmaster.core.ui.LoadingScreen
+import com.globant.ticketmaster.feature.countries.CountriesUiState
 
 @Composable
 fun FavoritesRoute(
-    onEventClick: (EventUi) -> Unit,
+    navigateToDetailEvent: (EventUi) -> Unit,
     viewModel: FavoritesViewModel = hiltViewModel(),
 ) {
     val eventsState = viewModel.uiState.collectAsLazyPagingItems()
+    val countriesState by viewModel.countriesState.collectAsStateWithLifecycle()
     var search by remember { mutableStateOf(TextFieldValue("")) }
     FavoritesRoute(
         eventsState = eventsState,
-        onEventClick = onEventClick,
+        countriesState = countriesState,
         search = search,
-        onFavoriteClick = viewModel::updateFavoriteEvent,
         onSearch = {
             search = it
-            viewModel.onSearch(it.text)
         },
+        onEvents = viewModel::onTriggerEvent,
     )
+
+    LaunchViewEffect(viewModel) { effect ->
+        when (effect) {
+            is FavoritesEffects.NavigateToDetailEvent -> navigateToDetailEvent(effect.event)
+        }
+    }
 }
 
 @Composable
 fun FavoritesRoute(
     eventsState: LazyPagingItems<EventUi>,
+    countriesState: CountriesUiState,
     search: TextFieldValue,
-    onEventClick: (EventUi) -> Unit,
-    onFavoriteClick: (EventUi) -> Unit,
     onSearch: (TextFieldValue) -> Unit,
+    onEvents: (FavoritesEvents) -> Unit,
 ) {
     Scaffold(
         topBar = {
             SearchTopAppBar(
                 search = search,
+                countriesState = countriesState,
+                onEvents = onEvents,
                 onSearch = onSearch,
             )
         },
@@ -69,7 +80,15 @@ fun FavoritesRoute(
                             count = eventsState.itemCount,
                         ) { item ->
                             eventsState[item]?.let { event ->
-                                EventItem(event, onEventClick, onFavoriteClick)
+                                EventItem(
+                                    event = event,
+                                    onEventClick = {
+                                        onEvents(FavoritesEvents.NavigateToDetailEvent(event))
+                                    },
+                                    onFavoriteClick = {
+                                        onEvents(FavoritesEvents.OnUpdateFavoriteEvent(event))
+                                    },
+                                )
                             }
                         }
                     }

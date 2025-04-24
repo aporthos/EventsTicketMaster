@@ -1,6 +1,7 @@
 package com.globant.ticketmaster.feature.events
 
 import com.globant.ticketmaster.core.models.domain.Classification
+import com.globant.ticketmaster.core.models.ui.CountryEventUi
 import com.globant.ticketmaster.core.models.ui.EventUi
 import com.globant.ticketmaster.core.ui.ViewEffect
 import com.globant.ticketmaster.core.ui.ViewEvent
@@ -18,7 +19,7 @@ sealed interface EventsUiState {
 }
 
 sealed interface EventsUiEvents : ViewEvent {
-    data class UpdateFavoriteEvent(
+    data class OnUpdateFavoriteEvent(
         val event: EventUi,
     ) : EventsUiEvents
 
@@ -35,6 +36,10 @@ sealed interface EventsUiEvents : ViewEvent {
     ) : EventsUiEvents
 
     data object NavigateToLastVisited : EventsUiEvents
+
+    data class OnSelectCountry(
+        val country: CountryEventUi,
+    ) : EventsUiEvents
 }
 
 sealed interface EventsEffects : ViewEffect {
