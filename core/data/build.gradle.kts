@@ -70,4 +70,9 @@ dependencies {
     implementation(project(":core:models:network"))
     implementation(project(":core:network"))
     implementation(project(":core:common"))
+    implementation(project(":core:testing"))
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

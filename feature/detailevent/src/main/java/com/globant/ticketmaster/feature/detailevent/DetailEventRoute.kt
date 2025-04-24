@@ -43,19 +43,16 @@ import com.globant.ticketmaster.core.designsystem.R as Designsystem
 @Serializable
 data class DetailEvent(
     val idEvent: String,
-    val name: String,
 )
 
 @Composable
 fun DetailEventRoute(
-    name: String,
     viewModel: DetailEventViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
 ) {
     val eventState by viewModel.eventState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     DetailEventRoute(
-        name = name,
         eventUiState = eventState,
         onFavoriteClick = viewModel::updateFavoriteEvent,
         onBackClick = onBackClick,
@@ -80,7 +77,6 @@ fun DetailEventRoute(
 
 @Composable
 fun DetailEventRoute(
-    name: String,
     eventUiState: EventUiState,
     onBackClick: () -> Unit,
     onFavoriteClick: (EventUi) -> Unit,
@@ -164,8 +160,7 @@ fun DetailEventsItems(
                             .fillMaxWidth()
                             .background(
                                 Color.Black.copy(alpha = 0.3f),
-                            )
-                            .padding(8.dp),
+                            ).padding(8.dp),
                 ) {
                     Text(
                         style = MaterialTheme.typography.titleLarge,

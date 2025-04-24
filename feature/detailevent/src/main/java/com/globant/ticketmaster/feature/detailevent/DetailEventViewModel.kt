@@ -1,5 +1,6 @@
 package com.globant.ticketmaster.feature.detailevent
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +13,7 @@ import com.globant.ticketmaster.core.models.ui.EventUi
 import com.globant.ticketmaster.core.models.ui.domainToUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -25,26 +27,19 @@ class DetailEventViewModel
     constructor(
         savedStateHandle: SavedStateHandle,
         getDetailEventUseCase: GetDetailEventUseCase,
-        addLastVisitedEventUseCase: AddLastVisitedEventUseCase,
+        private val addLastVisitedEventUseCase: AddLastVisitedEventUseCase,
         private val updateFavoriteEventUseCase: UpdateFavoriteEventUseCase,
     ) : ViewModel() {
-        private val idEvent = savedStateHandle.toRoute<DetailEvent>().idEvent
+        @VisibleForTesting
+        val idEvent = savedStateHandle.toRoute<DetailEvent>().idEvent
 
         init {
             viewModelScope.launch {
-                addLastVisitedEventUseCase(
-                    AddLastVisitedEventUseCase.Params(
-                        idEvent = idEvent,
-                        lastVisited = Date().time,
-                        countryCode = "MX",
-                    ),
-                ).onFailure {
-                    Timber.e("updateLastVisitedEvent -> $it")
-                }
+                addLastVisitedEvent(idEvent)
             }
         }
 
-        val eventState =
+        val eventState: StateFlow<EventUiState> =
             getDetailEventUseCase(GetDetailEventUseCase.Params(idEvent))
                 .map {
                     EventUiState.Success(it.domainToUi())
@@ -54,14 +49,27 @@ class DetailEventViewModel
                     started = SharingStarted.WhileSubscribed(),
                 )
 
-        fun updateFavoriteEvent(event: EventUi) {
-            val eventType =
-                if (event.eventType == EventType.Default) {
-                    EventType.Favorite
-                } else {
-                    EventType.Default
-                }
+        private suspend fun addLastVisitedEvent(idEvent: String) {
+            addLastVisitedEventUseCase(
+                AddLastVisitedEventUseCase.Params(
+                    idEvent = idEvent,
+                    lastVisited = Date().time,
+                    countryCode = "MX",
+                ),
+            ).onFailure {
+                Timber.e("addLastVisitedEvent -> $it")
+            }
+        }
+
+        fun updateFavoriteEvent(event: EventUi) =
             viewModelScope.launch {
+                val eventType =
+                    if (event.eventType == EventType.Default) {
+                        EventType.Favorite
+                    } else {
+                        EventType.Default
+                    }
+
                 updateFavoriteEventUseCase(
                     UpdateFavoriteEventUseCase.Params(
                         event.idEvent,
@@ -71,5 +79,4 @@ class DetailEventViewModel
                     Timber.e("updateFavoriteEvent -> $it")
                 }
             }
-        }
     }

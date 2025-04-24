@@ -19,13 +19,12 @@ class SuggestionsLocalDataSourceImpl
         private val suggestionsDao: SuggestionsEventsDao,
         @IoDispatcher private val dispatcher: CoroutineDispatcher,
     ) : SuggestionsLocalDataSource {
-        override suspend fun addSuggestionsEvents(events: List<Event>) {
+        override suspend fun addSuggestionsEvents(events: List<Event>): Boolean =
             withContext(dispatcher) {
                 val suggestions = events.map { SuggestionEventEntity(it.idEvent) }
                 suggestionsDao.deleteSuggestions()
-                suggestionsDao.insertOrIgnore(suggestions)
+                suggestionsDao.insertOrIgnore(suggestions).isNotEmpty()
             }
-        }
 
         override fun getSuggestionsEvents(countryCode: String): Flow<List<Event>> =
             suggestionsDao
@@ -35,7 +34,7 @@ class SuggestionsLocalDataSourceImpl
     }
 
 interface SuggestionsLocalDataSource {
-    suspend fun addSuggestionsEvents(events: List<Event>)
+    suspend fun addSuggestionsEvents(events: List<Event>): Boolean
 
     fun getSuggestionsEvents(countryCode: String): Flow<List<Event>>
 }

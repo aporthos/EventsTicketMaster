@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SuggestionsEventsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrIgnore(entities: List<SuggestionEventEntity>)
+    suspend fun insertOrIgnore(entities: List<SuggestionEventEntity>): List<Long>
 
     @Transaction
     @Query(

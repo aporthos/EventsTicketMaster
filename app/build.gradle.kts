@@ -50,6 +50,12 @@ android {
         buildConfig = true
         compose = true
     }
+
+    testOptions {
+        packaging {
+            resources.excludes.add("META-INF/*")
+        }
+    }
 }
 
 dependencies {
@@ -81,4 +87,5 @@ dependencies {
     implementation(project(":feature:detailevent"))
     implementation(project(":feature:searchevent"))
     implementation(project(":feature:lastvisited"))
+    implementation(project(":feature:onboarding"))
 }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ClassificationsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrIgnore(entities: List<ClassificationsEntity>)
+    suspend fun insertOrIgnore(entities: List<ClassificationsEntity>): List<Long>
 
     @Transaction
     @Query(

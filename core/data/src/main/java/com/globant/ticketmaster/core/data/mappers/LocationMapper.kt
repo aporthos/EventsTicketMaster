@@ -6,8 +6,6 @@ import com.globant.ticketmaster.core.models.network.events.LocationNetwork
 
 fun LocationNetwork.networkToDomain(): Location = Location(latitude = latitude.toDouble(), longitude = longitude.toDouble())
 
-fun LocationNetwork.networkToEntity(): LocationEntity = LocationEntity(latitude = latitude.toDouble(), longitude = longitude.toDouble())
-
 fun Location.domainToEntity(): LocationEntity = LocationEntity(latitude = latitude, longitude = longitude)
 
 fun LocationEntity.entityToDomain(): Location = Location(latitude = latitude, longitude = longitude)

@@ -193,9 +193,6 @@ fun SectionClassifications(
     onEvents: (EventsUiEvents) -> Unit,
 ) {
     when (classificationsState) {
-        ClassificationsUiState.Error -> {
-        }
-
         ClassificationsUiState.Loading -> {
             Box(
                 modifier = Modifier.fillMaxWidth(),

@@ -25,15 +25,14 @@ class ClassificationsLocalDataSourceImpl
                 .map(List<ClassificationsEntity>::entityToDomains)
                 .flowOn(dispatcher)
 
-        override suspend fun addClassifications(classifications: List<Classification>) {
+        override suspend fun addClassifications(classifications: List<Classification>): Boolean =
             withContext(dispatcher) {
-                dao.insertOrIgnore(classifications.domainToEntities())
+                dao.insertOrIgnore(classifications.domainToEntities()).isNotEmpty()
             }
-        }
     }
 
 interface ClassificationsLocalDataSource {
     fun getClassificationsStream(): Flow<List<Classification>>
 
-    suspend fun addClassifications(classifications: List<Classification>)
+    suspend fun addClassifications(classifications: List<Classification>): Boolean
 }

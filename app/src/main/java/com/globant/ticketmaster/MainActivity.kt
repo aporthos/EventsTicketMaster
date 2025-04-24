@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.toRoute
 import com.globant.ticketmaster.core.designsystem.theme.ChallengeTicketmasterTheme
 import com.globant.ticketmaster.core.models.domain.Classification
 import com.globant.ticketmaster.core.models.ui.EventUi
@@ -53,7 +52,7 @@ fun TicketMasterAppNavHost(appState: TicketMasterAppState) {
             HomeMainContainer(
                 items = appState.bottomBarRoutes,
                 navigateToDetailEvent = {
-                    appState.navigateToDetailEvent(DetailEvent(it.idEvent, it.name))
+                    appState.navigateToDetailEvent(DetailEvent(it.idEvent))
                 },
                 navigateToClassification = {
                     appState.navigateToSearchEvents(SearchEvents(it.idClassification))
@@ -67,15 +66,14 @@ fun TicketMasterAppNavHost(appState: TicketMasterAppState) {
             )
         }
 
-        composable<DetailEvent> { backStackEntry ->
-            val name = backStackEntry.toRoute<DetailEvent>().name
-            DetailEventRoute(name = name, onBackClick = appState::upPress)
+        composable<DetailEvent> {
+            DetailEventRoute(onBackClick = appState::upPress)
         }
 
         composable<SearchEvents> {
             SearchEventsRoute(
                 onEventClick = {
-                    appState.navigateToDetailEvent(DetailEvent(it.idEvent, it.name))
+                    appState.navigateToDetailEvent(DetailEvent(it.idEvent))
                 },
                 onBackClick = appState::upPress,
             )
@@ -85,7 +83,7 @@ fun TicketMasterAppNavHost(appState: TicketMasterAppState) {
             LastVisitedRoute(
                 onBackClick = appState::upPress,
                 onEventClick = {
-                    appState.navigateToDetailEvent(DetailEvent(it.idEvent, it.name))
+                    appState.navigateToDetailEvent(DetailEvent(it.idEvent))
                 },
             )
         }

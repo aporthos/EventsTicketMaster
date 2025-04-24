@@ -64,7 +64,5 @@ sealed interface ClassificationsUiState {
         val classifications: List<Classification>,
     ) : ClassificationsUiState
 
-    data object Error : ClassificationsUiState
-
     data object Loading : ClassificationsUiState
 }
