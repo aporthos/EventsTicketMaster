@@ -1,6 +1,6 @@
 # Events TicketMaster
 
-### This app can be used to search events by country, save favorite events, view more details(dates, times, location, etc)
+### This app can be used to events, save favorites, and see details (schedule, speakers, maps) offline. Filter by country to find events anywhere.
 
 ![screens](https://github.com/user-attachments/assets/cc8790d6-8cd7-4048-a6f5-c77b68ccdc34)
 
@@ -18,7 +18,8 @@ directory (usually `~/.gradle/gradle.properties` on Linux and Mac) or in the pro
 API_KEY=<your TicletMaster api key>
 ```
 
-<img src="https://github.com/user-attachments/assets/dc0a3a9d-aa2c-4793-9d93-2cf611b132bc" align="right" width="320"/>
+
+<img src="https://github.com/user-attachments/assets/05e5665d-2c0d-4ef6-898d-d23daffe3c1f" align="right" width="320"/>
 
 ## Tech stack & Open-source libraries
 - Minimum SDK level 24.
